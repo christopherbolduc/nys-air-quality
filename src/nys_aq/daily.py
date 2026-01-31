@@ -436,22 +436,57 @@ def enrich_rows_with_sensor_meta(
     return added, elapsed
 
 
-def _svg_parameter_coverage(report_dir: Path, *, report_date: str, top_params: list[tuple[str, int]]) -> Path:
+def pretty_parameter_name(param: str) -> str:
+    p = (param or "").strip().lower()
+    mapping = {
+        "pm25": "PM2.5",
+        "pm10": "PM10",
+        "pm1": "PM1",
+        "pm4": "PM4",
+        "o3": "O₃",
+        "no2": "NO₂",
+        "so2": "SO₂",
+        "co": "CO",
+        "co2": "CO₂",
+        "nox": "NOₓ",
+        "no": "NO",
+        "bc": "Black carbon",
+        "ufp": "Ultrafine particles",
+    }
+    return mapping.get(p, param)
+
+
+def _svg_parameter_coverage(
+    report_dir: Path,
+    *,
+    report_date: str,
+    top_params: list[tuple[str, int]],
+    title_suffix: str = "Pollutant coverage",
+) -> Path:
     """
     Horizontal bar chart: measurement counts by parameter for the daily sample.
+    Includes an in-chart dynamic dictionary (bottom-right).
     """
+    from datetime import date as _date
     from xml.sax.saxutils import escape
 
     chart_path = report_dir / "parameter_coverage.svg"
 
-    items = [(p, int(c)) for p, c in top_params if isinstance(p, str)]
+    # Format date: "D Month, YYYY" (no leading zero)
+    try:
+        d = _date.fromisoformat(report_date)
+        pretty_date = f"{d.day} {d.strftime('%B')}, {d.year}"
+    except ValueError:
+        pretty_date = report_date
+
+    items = [(str(p), int(c)) for p, c in top_params]
     items = items[:10]
 
     total = sum(c for _, c in items) or 1
     max_v = max((c for _, c in items), default=1)
 
-    width, height = 900, 420
-    pad_left, pad_right, pad_top, pad_bottom = 220, 30, 70, 50
+    width, height = 980, 420
+    pad_left, pad_right, pad_top, pad_bottom = 230, 40, 70, 50
     plot_w = width - pad_left - pad_right
     plot_h = height - pad_top - pad_bottom
 
@@ -462,13 +497,55 @@ def _svg_parameter_coverage(report_dir: Path, *, report_date: str, top_params: l
         height = pad_top + needed_h + pad_bottom
         plot_h = needed_h
 
-    def x_for(v: float) -> float:
-        return pad_left + (v / max_v) * plot_w
+    y0 = pad_top
+    y1 = pad_top + plot_h
 
-    # Nice-ish tick step: 5 ticks including 0 and max
+    # Ticks/grid
     tick_count = 5
     tick_step = max(1, int(max_v / (tick_count - 1)))
     tick_max = tick_step * (tick_count - 1)
+
+    navy = "#0B1F3B"
+
+    dictionary = {
+        "pm25": "PM2.5: fine particles ≤2.5 µm",
+        "pm10": "PM10: particles ≤10 µm",
+        "pm1": "PM1: particles ≤1 µm",
+        "pm4": "PM4: particles ≤4 µm",
+        "o3": "O3: ozone",
+        "no2": "NO2: nitrogen dioxide",
+        "so2": "SO2: sulfur dioxide",
+        "co": "CO: carbon monoxide",
+        "bc": "BC: black carbon",
+        "co2": "CO2: carbon dioxide",
+        "no": "NO: nitric oxide",
+        "nox": "NOx: nitrogen oxides",
+        "ch4": "CH4: methane",
+        "ufp": "UFP: ultrafine particles",
+    }
+
+    present = [p.strip().lower() for p, _ in items]
+    present_set = set(present)
+
+    priority = [
+        "pm25",
+        "pm10",
+        "o3",
+        "no2",
+        "so2",
+        "co",
+        "bc",
+        "pm1",
+        "pm4",
+        "co2",
+        "no",
+        "nox",
+        "ch4",
+        "ufp",
+    ]
+
+    ordered_keys = [k for k in priority if k in present_set]
+    legend_lines = [dictionary[k] for k in ordered_keys if k in dictionary]
 
     parts: list[str] = []
     parts.append(f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}">')
@@ -476,21 +553,20 @@ def _svg_parameter_coverage(report_dir: Path, *, report_date: str, top_params: l
 
     parts.append(
         f'<text x="{pad_left}" y="26" font-family="Arial, sans-serif" font-size="18">'
-        f'Parameter coverage — {escape(report_date)}'
+        f'{escape(title_suffix)} — {escape(pretty_date)}'
         f"</text>"
     )
     parts.append(
         f'<text x="{pad_left}" y="48" font-family="Arial, sans-serif" font-size="12" fill="gray">'
-        f'Counts of measurements returned by OpenAQ /latest across the NY daily sample (top {len(items)}). Total shown: {total}.'
+        f'Counts returned by OpenAQ / latest across the NY daily sample (top {len(items)}). Total shown: {total}.'
         f"</text>"
     )
 
-    # Axis + grid
-    y0 = pad_top
-    y1 = pad_top + plot_h
+    # Axes
     parts.append(f'<line x1="{pad_left}" y1="{y0}" x2="{pad_left}" y2="{y1}" stroke="black"/>')
     parts.append(f'<line x1="{pad_left}" y1="{y1}" x2="{pad_left + plot_w}" y2="{y1}" stroke="black"/>')
 
+    # Grid + tick labels
     for i in range(tick_count):
         v = i * tick_step
         x = pad_left + (v / tick_max) * plot_w if tick_max else pad_left
@@ -505,30 +581,67 @@ def _svg_parameter_coverage(report_dir: Path, *, report_date: str, top_params: l
         f'font-size="12" text-anchor="middle">measurement count</text>'
     )
 
-    # Bars
+    # Bars + labels
+    max_label_x = width - pad_right
     for idx, (param, count) in enumerate(items):
         y = pad_top + idx * (bar_h + gap)
-        bar_w = (count / max_v) * plot_w if max_v else 0
+        bar_w = (count / max_v) * plot_w if max_v else 0.0
 
-        # Left labels
         parts.append(
             f'<text x="{pad_left - 10}" y="{y + bar_h - 5}" font-family="Arial, sans-serif" '
             f'font-size="12" text-anchor="end">{escape(param)}</text>'
         )
 
-        # Bar
         parts.append(
             f'<rect x="{pad_left}" y="{y}" width="{bar_w:.2f}" height="{bar_h}" '
-            f'fill="gray" stroke="black" stroke-width="0.5"/>'
+            f'fill="{navy}" stroke="black" stroke-width="0.5"/>'
         )
 
         pct = int(round((count / total) * 100))
         label = f"{count} ({pct}%)"
-        lx = pad_left + bar_w + 8
+
+        outside_x = pad_left + bar_w + 8
+        approx_text_w = 7 * len(label)
+        if outside_x + approx_text_w <= max_label_x:
+            parts.append(
+                f'<text x="{outside_x:.2f}" y="{y + bar_h - 5}" font-family="Arial, sans-serif" font-size="12">'
+                f"{escape(label)}</text>"
+            )
+        else:
+            inside_x = max(pad_left + 6, pad_left + bar_w - 6)
+            parts.append(
+                f'<text x="{inside_x:.2f}" y="{y + bar_h - 5}" font-family="Arial, sans-serif" font-size="12" '
+                f'fill="white" text-anchor="end">{escape(label)}</text>'
+            )
+
+    # In-chart dynamic dictionary (bottom-right)
+    if legend_lines:
+        line_h = 14
+        title_h = 14
+        pad_box = 10
+
+        # Size the box conservatively
+        box_w = 330
+        box_h = pad_box * 2 + title_h + len(legend_lines) * line_h
+
+        # Position bottom-right inside the plotting area
+        box_x = pad_left + plot_w - box_w - 10
+        box_y = y1 - box_h - 10
+
+        # Background
         parts.append(
-            f'<text x="{lx:.2f}" y="{y + bar_h - 5}" font-family="Arial, sans-serif" font-size="12">'
-            f"{escape(label)}</text>"
+            f'<rect x="{box_x:.2f}" y="{box_y:.2f}" width="{box_w}" height="{box_h}" '
+            f'fill="white" stroke="black" stroke-width="0.6"/>'
         )
+
+        tx = box_x + pad_box
+        ty = box_y + pad_box + 11
+
+        parts.append(f'<text x="{tx:.2f}" y="{ty:.2f}" font-family="Arial, sans-serif" font-size="11" fill="black">')
+        parts.append(f'<tspan x="{tx:.2f}" dy="0">Dictionary</tspan>')
+        for line in legend_lines:
+            parts.append(f'<tspan x="{tx:.2f}" dy="{line_h}">{escape(line)}</tspan>')
+        parts.append("</text>")
 
     parts.append("</svg>")
     chart_path.write_text("\n".join(parts) + "\n", encoding="utf-8")
@@ -538,6 +651,8 @@ def _svg_parameter_coverage(report_dir: Path, *, report_date: str, top_params: l
 def _svg_map(
     report_dir: Path,
     *,
+    report_date: str,
+    sample_label: str,
     ny_multipolygon: list,
     ny_locations: list[dict],
     rows: list[dict],
@@ -608,6 +723,9 @@ def _svg_map(
             g = int(lerp(156, 76, tt))
             b = int(lerp(18, 60, tt))
         return f"rgb({r},{g},{b})"
+    
+    def color_for_t(t: float) -> str:
+        return color_ramp(clamp01(t))
 
     vals_fresh = [v for _, _, v, stale in points if isinstance(v, (int, float)) and (not stale)]
     vals_all = [v for _, _, v, _ in points if isinstance(v, (int, float))]
@@ -654,11 +772,22 @@ def _svg_map(
     parts: list[str] = []
     parts.append(f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}">')
     parts.append(f'<rect x="0" y="0" width="{width}" height="{height}" fill="white"/>')
+    display_param = pretty_parameter_name(primary_param)
+
+    fresh_n = sum(1 for _, _, v, stale in points if (v is not None) and (not stale))
+    stale_n = sum(1 for _, _, v, stale in points if (v is not None) and stale)
+    missing_n = sum(1 for _, _, v, _ in points if v is None)
+
     parts.append(
-        f'<text x="{pad}" y="18" font-family="Arial, sans-serif" font-size="16">'
-        f'NY sample map — {escape(primary_param)}'
-        f"</text>"
-    )
+    f'<text x="{pad}" y="18" font-family="Arial, sans-serif" font-size="16">'
+    f'New York State — {escape(display_param)} (latest)'
+    f"</text>"
+)
+    parts.append(
+    f'<text x="{pad}" y="36" font-family="Arial, sans-serif" font-size="12" fill="gray">'
+    f'{escape(report_date)} • {escape(sample_label)} • fresh: {fresh_n} • stale: {stale_n} • missing: {missing_n}'
+    f"</text>"
+)
 
     for poly in ny_multipolygon:
         outer = poly[0]
@@ -675,9 +804,52 @@ def _svg_map(
         r = radius_for(v, stale)
         parts.append(f'<circle cx="{x:.2f}" cy="{y:.2f}" r="{r:.2f}" fill="{fill}" stroke="black" stroke-width="0.6"/>')
 
+        # Legend box (bottom-left, above the footer line)
+    legend_w = 260
+    legend_h = 54
+    legend_x = pad
+    legend_y = height - 18 - legend_h - 10  # 10px above footer
+
     parts.append(
-        f'<text x="{pad}" y="{height - 18}" font-family="Arial, sans-serif" font-size="12">'
-        f"Scale (p5–p95): {vmin:.2f} → {vmax:.2f} {escape(units)}; stale points shown in gray"
+        f'<rect x="{legend_x}" y="{legend_y}" width="{legend_w}" height="{legend_h}" '
+        f'fill="white" stroke="black" stroke-width="0.6"/>'
+    )
+
+    parts.append(
+        f'<text x="{legend_x + 10}" y="{legend_y + 18}" font-family="Arial, sans-serif" font-size="12">'
+        f'{escape(pretty_parameter_name(primary_param))} scale ({escape(units)})'
+        f"</text>"
+    )
+
+    # Color ramp (left->right)
+    ramp_x0 = legend_x + 10
+    ramp_y0 = legend_y + 26
+    ramp_w = legend_w - 20
+    ramp_h = 10
+    steps = 24
+    step_w = ramp_w / steps
+
+    for i in range(steps):
+        t0 = i / steps
+        x = ramp_x0 + i * step_w
+        parts.append(
+            f'<rect x="{x:.2f}" y="{ramp_y0:.2f}" width="{step_w + 0.6:.2f}" height="{ramp_h}" '
+            f'fill="{color_for_t(t0)}" stroke="none"/>'
+        )
+
+    parts.append(
+        f'<text x="{ramp_x0:.2f}" y="{legend_y + 50}" font-family="Arial, sans-serif" font-size="11" fill="gray">'
+        f"{vmin:.2f}</text>"
+    )
+    parts.append(
+        f'<text x="{(ramp_x0 + ramp_w):.2f}" y="{legend_y + 50}" font-family="Arial, sans-serif" font-size="11" fill="gray" '
+        f'text-anchor="end">{vmax:.2f}</text>'
+    )
+
+    # Footer line (kept, now below legend)
+    parts.append(
+        f'<text x="{pad}" y="{height - 18}" font-family="Arial, sans-serif" font-size="12" fill="gray">'
+        f"Scale uses p5–p95; stale points shown in gray"
         f"</text>"
     )
     parts.append("</svg>")
@@ -725,6 +897,11 @@ def write_outputs(
     Write daily artifacts (idempotent per report date).
     """
     report_date = cfg.run_date.isoformat()
+    sample_label = (
+    "All NY locations (with coordinates)"
+    if len(sampled_locations) == len(ny_locations)
+    else f"Stable sample ({len(sampled_locations)} of {len(ny_locations)} NY locations)"
+)
     data_dir = cfg.repo_root / "data"
     notes_dir = cfg.repo_root / "notes"
     reports_dir = cfg.repo_root / "reports" / report_date
@@ -739,11 +916,13 @@ def write_outputs(
 
     # Primary param = most common
     primary_param = top_params[0][0] if top_params else "unknown"
+    map_param = os.getenv("MAP_PARAM", primary_param).strip().lower() or primary_param
     unit = ""
     for r in rows:
-        if (r.get("parameter_name") or "unknown") == primary_param and r.get("units"):
+        if (r.get("parameter_name") or "unknown") == map_param and r.get("units"):
             unit = str(r.get("units"))
             break
+
 
     # CSV (upsert by report_date)
     csv_path = data_dir / "daily.csv"
@@ -774,7 +953,7 @@ def write_outputs(
     lines.append("## Technical summary")
     lines.append(f"- Report date (America/New_York): {report_date}")
     lines.append(f"- Locations in NY boundary: {len(ny_locations)}")
-    lines.append(f"- Locations sampled: {len(sampled_locations)}")
+    lines.append(f"- Locations used: {sample_label}")
     lines.append(f"- Measurements normalized: {len(rows)}")
     lines.append(f"- Locations catalog latency: {locations_latency_ms} ms")
     lines.append(f"- Latest fetch duration: {latest_elapsed_s:.2f} s")
@@ -810,14 +989,21 @@ def write_outputs(
     note_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
     # SVGs
-    chart_path = _svg_parameter_coverage(reports_dir, report_date=report_date, top_params=top_params)
-    map_path = _svg_map(
+    chart_path = _svg_parameter_coverage(
         reports_dir,
-        ny_multipolygon=load_ny_multipolygon(cfg),
-        ny_locations=ny_locations,
-        rows=rows,
-        primary_param=primary_param,
-        units=unit,
+        report_date=report_date,
+        top_params=top_params,
+        title_suffix="Pollutant coverage",
+    )
+    map_path = _svg_map(
+    reports_dir,
+    report_date=report_date,
+    sample_label=sample_label,
+    ny_multipolygon=load_ny_multipolygon(cfg),
+    ny_locations=ny_locations,
+    rows=rows,
+    primary_param=map_param,
+    units=unit,
     )
 
     return {
@@ -861,11 +1047,41 @@ def run_daily(*, run_date: date | None = None, tz_name: str = "America/New_York"
     print("sensor_cache_new_entries:", added)
     print("sensor_lookup_elapsed_s:", round(sensor_elapsed_s, 2))
 
-    param_counts: dict[str, int] = {}
+    pollutant_allowlist = {
+        # Core criteria pollutants (OpenAQ focus)
+        "pm25",
+        "pm10",
+        "so2",
+        "no2",
+        "co",
+        "o3",
+        "bc",
+        # Limited set extras OpenAQ mentions
+        "pm1",
+        "pm4",
+        "co2",
+        "no",
+        "nox",
+        "ch4",
+        "ufp",
+    }
+
+    pollutant_counts: dict[str, int] = {}
     for r in rows:
-        p = r.get("parameter_name") or "unknown"
-        param_counts[p] = param_counts.get(p, 0) + 1
-    top_params = sorted(param_counts.items(), key=lambda kv: (-kv[1], kv[0]))[:10]
+        p = (r.get("parameter_name") or "").strip().lower()
+        if p in pollutant_allowlist:
+            pollutant_counts[p] = pollutant_counts.get(p, 0) + 1
+
+    top_params = sorted(pollutant_counts.items(), key=lambda kv: (-kv[1], kv[0]))[:10]
+
+    # Fallback: if none of the allowlisted pollutants appear, show the top parameters overall
+    if not top_params:
+        all_counts: dict[str, int] = {}
+        for r in rows:
+            p = (r.get("parameter_name") or "unknown").strip().lower()
+            all_counts[p] = all_counts.get(p, 0) + 1
+        top_params = sorted(all_counts.items(), key=lambda kv: (-kv[1], kv[0]))[:10]
+
     print("top_parameters:", top_params)
 
     outputs = write_outputs(
