@@ -1,4 +1,3 @@
-# src/nys_aq/daily.py
 """
 Daily run logic for NYS air quality snapshots.
 
