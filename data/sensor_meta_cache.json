@@ -1,0 +1,1129 @@
+{
+  "saved_at_utc": "2026-01-29T19:43:23.260637Z",
+  "sensor_meta": {
+    "10454036": {
+      "parameter_name": "temperature",
+      "units": "c"
+    },
+    "10454043": {
+      "parameter_name": "pm25",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "10454057": {
+      "parameter_name": "pm1",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "10454068": {
+      "parameter_name": "relativehumidity",
+      "units": "%"
+    },
+    "10454078": {
+      "parameter_name": "um003",
+      "units": "particles/cm\u00b3"
+    },
+    "10454082": {
+      "parameter_name": "pm10",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "1050": {
+      "parameter_name": "pm25",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "1095": {
+      "parameter_name": "o3",
+      "units": "ppm"
+    },
+    "1096": {
+      "parameter_name": "pm25",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "1097": {
+      "parameter_name": "pm25",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "1098": {
+      "parameter_name": "o3",
+      "units": "ppm"
+    },
+    "10986460": {
+      "parameter_name": "pm25",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "10986461": {
+      "parameter_name": "pm25",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "10986462": {
+      "parameter_name": "pm25",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "10986463": {
+      "parameter_name": "pm25",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "10986465": {
+      "parameter_name": "pm25",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "10986466": {
+      "parameter_name": "pm25",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "10986467": {
+      "parameter_name": "pm25",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "1099": {
+      "parameter_name": "pm10",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "1102": {
+      "parameter_name": "pm25",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "1103": {
+      "parameter_name": "pm25",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "1104": {
+      "parameter_name": "o3",
+      "units": "ppm"
+    },
+    "1105": {
+      "parameter_name": "o3",
+      "units": "ppm"
+    },
+    "1106": {
+      "parameter_name": "o3",
+      "units": "ppm"
+    },
+    "11074566": {
+      "parameter_name": "pm1",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "11074571": {
+      "parameter_name": "pm25",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "11074572": {
+      "parameter_name": "pm10",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "11074582": {
+      "parameter_name": "relativehumidity",
+      "units": "%"
+    },
+    "11074585": {
+      "parameter_name": "temperature",
+      "units": "c"
+    },
+    "11074587": {
+      "parameter_name": "um003",
+      "units": "particles/cm\u00b3"
+    },
+    "1108": {
+      "parameter_name": "o3",
+      "units": "ppm"
+    },
+    "1109": {
+      "parameter_name": "pm25",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "1110": {
+      "parameter_name": "o3",
+      "units": "ppm"
+    },
+    "1112": {
+      "parameter_name": "o3",
+      "units": "ppm"
+    },
+    "1119": {
+      "parameter_name": "o3",
+      "units": "ppm"
+    },
+    "1121": {
+      "parameter_name": "pm25",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "1125": {
+      "parameter_name": "o3",
+      "units": "ppm"
+    },
+    "1126": {
+      "parameter_name": "o3",
+      "units": "ppm"
+    },
+    "1127": {
+      "parameter_name": "pm25",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "1128": {
+      "parameter_name": "pm25",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "1129": {
+      "parameter_name": "o3",
+      "units": "ppm"
+    },
+    "1134": {
+      "parameter_name": "pm25",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "1137": {
+      "parameter_name": "pm25",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "1138": {
+      "parameter_name": "o3",
+      "units": "ppm"
+    },
+    "1143": {
+      "parameter_name": "pm25",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "1145": {
+      "parameter_name": "pm25",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "1146": {
+      "parameter_name": "pm25",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "1147": {
+      "parameter_name": "o3",
+      "units": "ppm"
+    },
+    "1151": {
+      "parameter_name": "o3",
+      "units": "ppm"
+    },
+    "1152": {
+      "parameter_name": "pm25",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "1155": {
+      "parameter_name": "o3",
+      "units": "ppm"
+    },
+    "1156": {
+      "parameter_name": "pm25",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "1159": {
+      "parameter_name": "o3",
+      "units": "ppm"
+    },
+    "11792491": {
+      "parameter_name": "pm25",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "11792497": {
+      "parameter_name": "relativehumidity",
+      "units": "%"
+    },
+    "11792503": {
+      "parameter_name": "pm10",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "11792506": {
+      "parameter_name": "temperature",
+      "units": "c"
+    },
+    "11792507": {
+      "parameter_name": "pm1",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "11792515": {
+      "parameter_name": "um003",
+      "units": "particles/cm\u00b3"
+    },
+    "12178175": {
+      "parameter_name": "pm1",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "12178176": {
+      "parameter_name": "pm25",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "12178177": {
+      "parameter_name": "relativehumidity",
+      "units": "%"
+    },
+    "12178178": {
+      "parameter_name": "temperature",
+      "units": "c"
+    },
+    "12178491": {
+      "parameter_name": "um003",
+      "units": "particles/cm\u00b3"
+    },
+    "12212726": {
+      "parameter_name": "pm1",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "12212727": {
+      "parameter_name": "pm25",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "12212728": {
+      "parameter_name": "relativehumidity",
+      "units": "%"
+    },
+    "12212729": {
+      "parameter_name": "temperature",
+      "units": "c"
+    },
+    "12212730": {
+      "parameter_name": "um003",
+      "units": "particles/cm\u00b3"
+    },
+    "1323439": {
+      "parameter_name": "pm25",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "13278264": {
+      "parameter_name": "pm1",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "13278265": {
+      "parameter_name": "pm25",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "13278266": {
+      "parameter_name": "relativehumidity",
+      "units": "%"
+    },
+    "13278267": {
+      "parameter_name": "temperature",
+      "units": "c"
+    },
+    "13278268": {
+      "parameter_name": "um003",
+      "units": "particles/cm\u00b3"
+    },
+    "13322774": {
+      "parameter_name": "pm1",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "13322775": {
+      "parameter_name": "pm25",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "13322776": {
+      "parameter_name": "relativehumidity",
+      "units": "%"
+    },
+    "13322777": {
+      "parameter_name": "temperature",
+      "units": "c"
+    },
+    "13322778": {
+      "parameter_name": "um003",
+      "units": "particles/cm\u00b3"
+    },
+    "13729144": {
+      "parameter_name": "pm1",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "13729145": {
+      "parameter_name": "pm25",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "13729146": {
+      "parameter_name": "relativehumidity",
+      "units": "%"
+    },
+    "13729147": {
+      "parameter_name": "temperature",
+      "units": "c"
+    },
+    "13729148": {
+      "parameter_name": "um003",
+      "units": "particles/cm\u00b3"
+    },
+    "13779013": {
+      "parameter_name": "pm1",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "13779014": {
+      "parameter_name": "pm25",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "13779015": {
+      "parameter_name": "relativehumidity",
+      "units": "%"
+    },
+    "13779016": {
+      "parameter_name": "temperature",
+      "units": "c"
+    },
+    "13779017": {
+      "parameter_name": "um003",
+      "units": "particles/cm\u00b3"
+    },
+    "13847109": {
+      "parameter_name": "pm1",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "13847110": {
+      "parameter_name": "pm25",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "13847111": {
+      "parameter_name": "relativehumidity",
+      "units": "%"
+    },
+    "13847112": {
+      "parameter_name": "temperature",
+      "units": "c"
+    },
+    "13847113": {
+      "parameter_name": "um003",
+      "units": "particles/cm\u00b3"
+    },
+    "14152904": {
+      "parameter_name": "pm1",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "14152905": {
+      "parameter_name": "pm25",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "14152906": {
+      "parameter_name": "relativehumidity",
+      "units": "%"
+    },
+    "14152907": {
+      "parameter_name": "temperature",
+      "units": "c"
+    },
+    "14152908": {
+      "parameter_name": "um003",
+      "units": "particles/cm\u00b3"
+    },
+    "14152914": {
+      "parameter_name": "pm1",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "14152915": {
+      "parameter_name": "pm25",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "14152916": {
+      "parameter_name": "relativehumidity",
+      "units": "%"
+    },
+    "14152917": {
+      "parameter_name": "temperature",
+      "units": "c"
+    },
+    "14152918": {
+      "parameter_name": "um003",
+      "units": "particles/cm\u00b3"
+    },
+    "14153104": {
+      "parameter_name": "pm1",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "14153105": {
+      "parameter_name": "pm25",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "14153106": {
+      "parameter_name": "relativehumidity",
+      "units": "%"
+    },
+    "14153107": {
+      "parameter_name": "temperature",
+      "units": "c"
+    },
+    "14153108": {
+      "parameter_name": "um003",
+      "units": "particles/cm\u00b3"
+    },
+    "14153282": {
+      "parameter_name": "pm1",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "14153283": {
+      "parameter_name": "pm25",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "14153284": {
+      "parameter_name": "relativehumidity",
+      "units": "%"
+    },
+    "14153285": {
+      "parameter_name": "temperature",
+      "units": "c"
+    },
+    "14153286": {
+      "parameter_name": "um003",
+      "units": "particles/cm\u00b3"
+    },
+    "14153760": {
+      "parameter_name": "pm1",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "14153761": {
+      "parameter_name": "pm25",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "14153762": {
+      "parameter_name": "relativehumidity",
+      "units": "%"
+    },
+    "14153763": {
+      "parameter_name": "temperature",
+      "units": "c"
+    },
+    "14153764": {
+      "parameter_name": "um003",
+      "units": "particles/cm\u00b3"
+    },
+    "14153905": {
+      "parameter_name": "pm1",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "14153906": {
+      "parameter_name": "pm25",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "14153907": {
+      "parameter_name": "relativehumidity",
+      "units": "%"
+    },
+    "14153908": {
+      "parameter_name": "temperature",
+      "units": "c"
+    },
+    "14153909": {
+      "parameter_name": "um003",
+      "units": "particles/cm\u00b3"
+    },
+    "14349090": {
+      "parameter_name": "pm1",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "14349091": {
+      "parameter_name": "pm25",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "14349092": {
+      "parameter_name": "relativehumidity",
+      "units": "%"
+    },
+    "14349093": {
+      "parameter_name": "temperature",
+      "units": "c"
+    },
+    "14349094": {
+      "parameter_name": "um003",
+      "units": "particles/cm\u00b3"
+    },
+    "14491610": {
+      "parameter_name": "pm1",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "14491611": {
+      "parameter_name": "pm25",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "14491612": {
+      "parameter_name": "relativehumidity",
+      "units": "%"
+    },
+    "14491613": {
+      "parameter_name": "temperature",
+      "units": "c"
+    },
+    "14491614": {
+      "parameter_name": "um003",
+      "units": "particles/cm\u00b3"
+    },
+    "14536763": {
+      "parameter_name": "pm1",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "14536764": {
+      "parameter_name": "pm25",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "14536765": {
+      "parameter_name": "relativehumidity",
+      "units": "%"
+    },
+    "14536766": {
+      "parameter_name": "temperature",
+      "units": "c"
+    },
+    "14536767": {
+      "parameter_name": "um003",
+      "units": "particles/cm\u00b3"
+    },
+    "14904962": {
+      "parameter_name": "pm1",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "14904963": {
+      "parameter_name": "pm25",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "14904964": {
+      "parameter_name": "relativehumidity",
+      "units": "%"
+    },
+    "14904965": {
+      "parameter_name": "temperature",
+      "units": "c"
+    },
+    "14904966": {
+      "parameter_name": "um003",
+      "units": "particles/cm\u00b3"
+    },
+    "15101967": {
+      "parameter_name": "pm1",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "15101968": {
+      "parameter_name": "pm25",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "15101969": {
+      "parameter_name": "relativehumidity",
+      "units": "%"
+    },
+    "15101970": {
+      "parameter_name": "temperature",
+      "units": "c"
+    },
+    "15101971": {
+      "parameter_name": "um003",
+      "units": "particles/cm\u00b3"
+    },
+    "15102193": {
+      "parameter_name": "pm1",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "15102194": {
+      "parameter_name": "pm25",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "15102195": {
+      "parameter_name": "relativehumidity",
+      "units": "%"
+    },
+    "15102196": {
+      "parameter_name": "temperature",
+      "units": "c"
+    },
+    "15102197": {
+      "parameter_name": "um003",
+      "units": "particles/cm\u00b3"
+    },
+    "1662910": {
+      "parameter_name": "pm25",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "20493": {
+      "parameter_name": "o3",
+      "units": "ppm"
+    },
+    "24201": {
+      "parameter_name": "pm25",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "24886": {
+      "parameter_name": "o3",
+      "units": "ppm"
+    },
+    "25520": {
+      "parameter_name": "pm25",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "25987": {
+      "parameter_name": "pm25",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "2780575": {
+      "parameter_name": "pm25",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "3112582": {
+      "parameter_name": "no2",
+      "units": "ppm"
+    },
+    "3112583": {
+      "parameter_name": "so2",
+      "units": "ppm"
+    },
+    "3155": {
+      "parameter_name": "pm25",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "3157": {
+      "parameter_name": "so2",
+      "units": "ppm"
+    },
+    "3160": {
+      "parameter_name": "o3",
+      "units": "ppm"
+    },
+    "3163": {
+      "parameter_name": "no2",
+      "units": "ppm"
+    },
+    "459": {
+      "parameter_name": "o3",
+      "units": "ppm"
+    },
+    "5077695": {
+      "parameter_name": "o3",
+      "units": "ppm"
+    },
+    "5077732": {
+      "parameter_name": "pm25",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "5077821": {
+      "parameter_name": "pm25",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "617": {
+      "parameter_name": "pm25",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "6530188": {
+      "parameter_name": "temperature",
+      "units": "c"
+    },
+    "6530200": {
+      "parameter_name": "pm25",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "6530280": {
+      "parameter_name": "pm25",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "6530283": {
+      "parameter_name": "temperature",
+      "units": "c"
+    },
+    "668": {
+      "parameter_name": "o3",
+      "units": "ppm"
+    },
+    "671": {
+      "parameter_name": "o3",
+      "units": "ppm"
+    },
+    "672": {
+      "parameter_name": "pm25",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "673": {
+      "parameter_name": "pm25",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "674": {
+      "parameter_name": "o3",
+      "units": "ppm"
+    },
+    "675": {
+      "parameter_name": "o3",
+      "units": "ppm"
+    },
+    "683": {
+      "parameter_name": "o3",
+      "units": "ppm"
+    },
+    "684": {
+      "parameter_name": "o3",
+      "units": "ppm"
+    },
+    "686": {
+      "parameter_name": "o3",
+      "units": "ppm"
+    },
+    "689": {
+      "parameter_name": "pm25",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "6912303": {
+      "parameter_name": "temperature",
+      "units": "c"
+    },
+    "6912304": {
+      "parameter_name": "pm25",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "7254050": {
+      "parameter_name": "pm25",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "7254073": {
+      "parameter_name": "temperature",
+      "units": "c"
+    },
+    "7324143": {
+      "parameter_name": "pm25",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "7324145": {
+      "parameter_name": "temperature",
+      "units": "c"
+    },
+    "7386938": {
+      "parameter_name": "pm25",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "7386942": {
+      "parameter_name": "temperature",
+      "units": "c"
+    },
+    "7393668": {
+      "parameter_name": "pm25",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "7393669": {
+      "parameter_name": "temperature",
+      "units": "c"
+    },
+    "7652795": {
+      "parameter_name": "pm25",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "7652796": {
+      "parameter_name": "temperature",
+      "units": "c"
+    },
+    "789": {
+      "parameter_name": "o3",
+      "units": "ppm"
+    },
+    "7897332": {
+      "parameter_name": "temperature",
+      "units": "c"
+    },
+    "7897339": {
+      "parameter_name": "pm25",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "7897354": {
+      "parameter_name": "temperature",
+      "units": "c"
+    },
+    "7897355": {
+      "parameter_name": "pm25",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "7970808": {
+      "parameter_name": "pm10",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "7970818": {
+      "parameter_name": "pm10",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "7970822": {
+      "parameter_name": "pm1",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "7970982": {
+      "parameter_name": "pm1",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "7971030": {
+      "parameter_name": "pm1",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "7971050": {
+      "parameter_name": "pm1",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "7971073": {
+      "parameter_name": "pm10",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "7971082": {
+      "parameter_name": "pm1",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "7971117": {
+      "parameter_name": "pm10",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "7971189": {
+      "parameter_name": "pm10",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "7971247": {
+      "parameter_name": "pm1",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "7971262": {
+      "parameter_name": "pm10",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "7971316": {
+      "parameter_name": "pm1",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "7971373": {
+      "parameter_name": "pm10",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "7971567": {
+      "parameter_name": "relativehumidity",
+      "units": "%"
+    },
+    "7971572": {
+      "parameter_name": "um003",
+      "units": "particles/cm\u00b3"
+    },
+    "7972258": {
+      "parameter_name": "um003",
+      "units": "particles/cm\u00b3"
+    },
+    "7972295": {
+      "parameter_name": "relativehumidity",
+      "units": "%"
+    },
+    "7972608": {
+      "parameter_name": "relativehumidity",
+      "units": "%"
+    },
+    "7972609": {
+      "parameter_name": "um003",
+      "units": "particles/cm\u00b3"
+    },
+    "7972670": {
+      "parameter_name": "um003",
+      "units": "particles/cm\u00b3"
+    },
+    "7972671": {
+      "parameter_name": "um003",
+      "units": "particles/cm\u00b3"
+    },
+    "7972696": {
+      "parameter_name": "relativehumidity",
+      "units": "%"
+    },
+    "7972702": {
+      "parameter_name": "relativehumidity",
+      "units": "%"
+    },
+    "7972703": {
+      "parameter_name": "um003",
+      "units": "particles/cm\u00b3"
+    },
+    "7972707": {
+      "parameter_name": "relativehumidity",
+      "units": "%"
+    },
+    "7972874": {
+      "parameter_name": "um003",
+      "units": "particles/cm\u00b3"
+    },
+    "7972897": {
+      "parameter_name": "relativehumidity",
+      "units": "%"
+    },
+    "7973083": {
+      "parameter_name": "pm10",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "7973114": {
+      "parameter_name": "pm1",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "7973117": {
+      "parameter_name": "relativehumidity",
+      "units": "%"
+    },
+    "7973129": {
+      "parameter_name": "um003",
+      "units": "particles/cm\u00b3"
+    },
+    "7978166": {
+      "parameter_name": "pm1",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "7978193": {
+      "parameter_name": "pm10",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "7978344": {
+      "parameter_name": "pm1",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "7978370": {
+      "parameter_name": "pm10",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "7978991": {
+      "parameter_name": "pm1",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "7979020": {
+      "parameter_name": "pm10",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "7979626": {
+      "parameter_name": "pm1",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "7979671": {
+      "parameter_name": "pm10",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "7979816": {
+      "parameter_name": "pm10",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "7979835": {
+      "parameter_name": "pm1",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "7979861": {
+      "parameter_name": "pm1",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "7979870": {
+      "parameter_name": "pm10",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "7979901": {
+      "parameter_name": "pm1",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "7979909": {
+      "parameter_name": "pm10",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "818": {
+      "parameter_name": "o3",
+      "units": "ppm"
+    },
+    "8520920": {
+      "parameter_name": "relativehumidity",
+      "units": "%"
+    },
+    "8520925": {
+      "parameter_name": "pm25",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "8520933": {
+      "parameter_name": "um003",
+      "units": "particles/cm\u00b3"
+    },
+    "8520935": {
+      "parameter_name": "pm1",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "8520936": {
+      "parameter_name": "pm10",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "8520938": {
+      "parameter_name": "temperature",
+      "units": "c"
+    },
+    "8954486": {
+      "parameter_name": "relativehumidity",
+      "units": "%"
+    },
+    "8954490": {
+      "parameter_name": "pm25",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "8954491": {
+      "parameter_name": "um003",
+      "units": "particles/cm\u00b3"
+    },
+    "8954495": {
+      "parameter_name": "pm1",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "8954497": {
+      "parameter_name": "temperature",
+      "units": "c"
+    },
+    "8954498": {
+      "parameter_name": "pm10",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "9244019": {
+      "parameter_name": "um003",
+      "units": "particles/cm\u00b3"
+    },
+    "9244020": {
+      "parameter_name": "pm10",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "9244025": {
+      "parameter_name": "temperature",
+      "units": "c"
+    },
+    "9244029": {
+      "parameter_name": "pm25",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "9244031": {
+      "parameter_name": "pm1",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "9244033": {
+      "parameter_name": "relativehumidity",
+      "units": "%"
+    },
+    "9648774": {
+      "parameter_name": "relativehumidity",
+      "units": "%"
+    },
+    "9648782": {
+      "parameter_name": "pm1",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "9648783": {
+      "parameter_name": "pm10",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "9648796": {
+      "parameter_name": "um003",
+      "units": "particles/cm\u00b3"
+    },
+    "9648811": {
+      "parameter_name": "temperature",
+      "units": "c"
+    },
+    "9648812": {
+      "parameter_name": "pm25",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "9933176": {
+      "parameter_name": "pm10",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "9933181": {
+      "parameter_name": "temperature",
+      "units": "c"
+    },
+    "9933183": {
+      "parameter_name": "um003",
+      "units": "particles/cm\u00b3"
+    },
+    "9933184": {
+      "parameter_name": "pm25",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "9933191": {
+      "parameter_name": "pm1",
+      "units": "\u00b5g/m\u00b3"
+    },
+    "9933195": {
+      "parameter_name": "relativehumidity",
+      "units": "%"
+    }
+  }
+}

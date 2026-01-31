@@ -1,0 +1,2 @@
+report_date,report_tz,generated_at_utc,bbox,ny_locations,sampled_locations,measurements_total,stale_hours,stale_fraction,locations_latency_ms,latest_elapsed_s,top_parameters,primary_parameter,primary_units
+2026-01-30,America/New_York,2026-01-31T15:06:56.956208Z,"-79.8,40.45,-71.85,45.1",93,93,277,12,0.5379,1921,117.69,pm25:73;pm1:41;temperature:37;relativehumidity:35;um003:34;o3:31;pm10:22;no2:2;so2:2,pm25,µg/m³

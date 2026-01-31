@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="360">
+<rect x="0" y="0" width="900" height="360" fill="white"/>
+<text x="60" y="20" font-family="Arial, sans-serif" font-size="16">Parameter coverage (NY sample)</text>
+<line x1="60" y1="30" x2="60" y2="280" stroke="black"/>
+<line x1="60" y1="280" x2="880" y2="280" stroke="black"/>
+<rect x="73.67" y="30.00" width="63.78" height="250.00" fill="gray"/>
+<text x="105.56" y="290.00" font-family="Arial, sans-serif" font-size="11" transform="rotate(45 105.56 290.00)" text-anchor="start">pm25</text>
+<rect x="164.78" y="139.59" width="63.78" height="140.41" fill="gray"/>
+<text x="196.67" y="290.00" font-family="Arial, sans-serif" font-size="11" transform="rotate(45 196.67 290.00)" text-anchor="start">pm1</text>
+<rect x="255.89" y="153.29" width="63.78" height="126.71" fill="gray"/>
+<text x="287.78" y="290.00" font-family="Arial, sans-serif" font-size="11" transform="rotate(45 287.78 290.00)" text-anchor="start">temperature</text>
+<rect x="347.00" y="160.14" width="63.78" height="119.86" fill="gray"/>
+<text x="378.89" y="290.00" font-family="Arial, sans-serif" font-size="11" transform="rotate(45 378.89 290.00)" text-anchor="start">relativehumidity</text>
+<rect x="438.11" y="163.56" width="63.78" height="116.44" fill="gray"/>
+<text x="470.00" y="290.00" font-family="Arial, sans-serif" font-size="11" transform="rotate(45 470.00 290.00)" text-anchor="start">um003</text>
+<rect x="529.22" y="173.84" width="63.78" height="106.16" fill="gray"/>
+<text x="561.11" y="290.00" font-family="Arial, sans-serif" font-size="11" transform="rotate(45 561.11 290.00)" text-anchor="start">o3</text>
+<rect x="620.33" y="204.66" width="63.78" height="75.34" fill="gray"/>
+<text x="652.22" y="290.00" font-family="Arial, sans-serif" font-size="11" transform="rotate(45 652.22 290.00)" text-anchor="start">pm10</text>
+<rect x="711.44" y="273.15" width="63.78" height="6.85" fill="gray"/>
+<text x="743.33" y="290.00" font-family="Arial, sans-serif" font-size="11" transform="rotate(45 743.33 290.00)" text-anchor="start">no2</text>
+<rect x="802.56" y="273.15" width="63.78" height="6.85" fill="gray"/>
+<text x="834.44" y="290.00" font-family="Arial, sans-serif" font-size="11" transform="rotate(45 834.44 290.00)" text-anchor="start">so2</text>
+<text x="15" y="155.00" font-family="Arial, sans-serif" font-size="12" transform="rotate(-90 15 155.00)" text-anchor="middle">measurement count</text>
+</svg>
