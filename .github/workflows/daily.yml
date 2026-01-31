@@ -1,0 +1,52 @@
+name: Daily NYS Air Quality
+
+on:
+  schedule:
+    # 11:00 UTC ~= 6:00 AM US/Eastern during standard time (shifts to 7:00 AM during DST)
+    - cron: "0 11 * * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e .
+
+      - name: Run daily job
+        env:
+          OPENAQ_API_KEY: ${{ secrets.OPENAQ_API_KEY }}
+        run: |
+          python scripts/run_daily.py
+
+      - name: Create pull request
+        uses: peter-evans/create-pull-request@v7
+        with:
+          commit-message: "Daily air quality update"
+          title: "Daily air quality update"
+          body: |
+            Automated daily run (OpenAQ) with NY boundary filter.
+            Review artifacts in notes/ and reports/ and merge when ready.
+          branch: "automation/daily"
+          delete-branch: true
+          labels: "automation"
+          add-paths: |
+            data/daily.csv
+            data/sensor_meta_cache.json
+            notes/
+            reports/
