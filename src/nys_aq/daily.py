@@ -436,51 +436,101 @@ def enrich_rows_with_sensor_meta(
     return added, elapsed
 
 
-def _svg_parameter_coverage(report_dir: Path, top_params: list[tuple[str, int]]) -> Path:
+def _svg_parameter_coverage(report_dir: Path, *, report_date: str, top_params: list[tuple[str, int]]) -> Path:
+    """
+    Horizontal bar chart: measurement counts by parameter for the daily sample.
+    """
     from xml.sax.saxutils import escape
 
     chart_path = report_dir / "parameter_coverage.svg"
-    labels = [p for p, _ in top_params]
-    values = [c for _, c in top_params]
 
-    width, height = 900, 360
-    pad_left, pad_right, pad_top, pad_bottom = 60, 20, 30, 80
+    items = [(p, int(c)) for p, c in top_params if isinstance(p, str)]
+    items = items[:10]
+
+    total = sum(c for _, c in items) or 1
+    max_v = max((c for _, c in items), default=1)
+
+    width, height = 900, 420
+    pad_left, pad_right, pad_top, pad_bottom = 220, 30, 70, 50
     plot_w = width - pad_left - pad_right
     plot_h = height - pad_top - pad_bottom
 
-    max_v = max(values) if values else 1
-    bar_w = plot_w / max(len(values), 1)
+    bar_h = 22
+    gap = 10
+    needed_h = len(items) * (bar_h + gap) - gap
+    if needed_h > plot_h:
+        height = pad_top + needed_h + pad_bottom
+        plot_h = needed_h
 
-    def y_for(v: float) -> float:
-        return pad_top + (1 - (v / max_v)) * plot_h
+    def x_for(v: float) -> float:
+        return pad_left + (v / max_v) * plot_w
+
+    # Nice-ish tick step: 5 ticks including 0 and max
+    tick_count = 5
+    tick_step = max(1, int(max_v / (tick_count - 1)))
+    tick_max = tick_step * (tick_count - 1)
 
     parts: list[str] = []
     parts.append(f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}">')
     parts.append(f'<rect x="0" y="0" width="{width}" height="{height}" fill="white"/>')
-    parts.append(f'<text x="{pad_left}" y="20" font-family="Arial, sans-serif" font-size="16">Parameter coverage (NY sample)</text>')
-    parts.append(f'<line x1="{pad_left}" y1="{pad_top}" x2="{pad_left}" y2="{pad_top + plot_h}" stroke="black"/>')
-    parts.append(f'<line x1="{pad_left}" y1="{pad_top + plot_h}" x2="{pad_left + plot_w}" y2="{pad_top + plot_h}" stroke="black"/>')
 
-    for i, (lab, v) in enumerate(zip(labels, values)):
-        x = pad_left + i * bar_w + bar_w * 0.15
-        w = bar_w * 0.7
-        y = y_for(v)
-        h = (pad_top + plot_h) - y
-        parts.append(f'<rect x="{x:.2f}" y="{y:.2f}" width="{w:.2f}" height="{h:.2f}" fill="gray"/>')
+    parts.append(
+        f'<text x="{pad_left}" y="26" font-family="Arial, sans-serif" font-size="18">'
+        f'Parameter coverage — {escape(report_date)}'
+        f"</text>"
+    )
+    parts.append(
+        f'<text x="{pad_left}" y="48" font-family="Arial, sans-serif" font-size="12" fill="gray">'
+        f'Counts of measurements returned by OpenAQ /latest across the NY daily sample (top {len(items)}). Total shown: {total}.'
+        f"</text>"
+    )
 
-        lx = pad_left + i * bar_w + bar_w * 0.5
-        ly = pad_top + plot_h + 10
+    # Axis + grid
+    y0 = pad_top
+    y1 = pad_top + plot_h
+    parts.append(f'<line x1="{pad_left}" y1="{y0}" x2="{pad_left}" y2="{y1}" stroke="black"/>')
+    parts.append(f'<line x1="{pad_left}" y1="{y1}" x2="{pad_left + plot_w}" y2="{y1}" stroke="black"/>')
+
+    for i in range(tick_count):
+        v = i * tick_step
+        x = pad_left + (v / tick_max) * plot_w if tick_max else pad_left
+        parts.append(f'<line x1="{x:.2f}" y1="{y0}" x2="{x:.2f}" y2="{y1}" stroke="lightgray"/>')
         parts.append(
-            f'<text x="{lx:.2f}" y="{ly:.2f}" font-family="Arial, sans-serif" font-size="11" '
-            f'transform="rotate(45 {lx:.2f} {ly:.2f})" text-anchor="start">{escape(lab)}</text>'
+            f'<text x="{x:.2f}" y="{y1 + 18}" font-family="Arial, sans-serif" font-size="11" '
+            f'text-anchor="middle">{v}</text>'
         )
 
     parts.append(
-        f'<text x="15" y="{pad_top + plot_h/2:.2f}" font-family="Arial, sans-serif" font-size="12" '
-        f'transform="rotate(-90 15 {pad_top + plot_h/2:.2f})" text-anchor="middle">measurement count</text>'
+        f'<text x="{pad_left + plot_w/2:.2f}" y="{height - 12}" font-family="Arial, sans-serif" '
+        f'font-size="12" text-anchor="middle">measurement count</text>'
     )
-    parts.append("</svg>")
 
+    # Bars
+    for idx, (param, count) in enumerate(items):
+        y = pad_top + idx * (bar_h + gap)
+        bar_w = (count / max_v) * plot_w if max_v else 0
+
+        # Left labels
+        parts.append(
+            f'<text x="{pad_left - 10}" y="{y + bar_h - 5}" font-family="Arial, sans-serif" '
+            f'font-size="12" text-anchor="end">{escape(param)}</text>'
+        )
+
+        # Bar
+        parts.append(
+            f'<rect x="{pad_left}" y="{y}" width="{bar_w:.2f}" height="{bar_h}" '
+            f'fill="gray" stroke="black" stroke-width="0.5"/>'
+        )
+
+        pct = int(round((count / total) * 100))
+        label = f"{count} ({pct}%)"
+        lx = pad_left + bar_w + 8
+        parts.append(
+            f'<text x="{lx:.2f}" y="{y + bar_h - 5}" font-family="Arial, sans-serif" font-size="12">'
+            f"{escape(label)}</text>"
+        )
+
+    parts.append("</svg>")
     chart_path.write_text("\n".join(parts) + "\n", encoding="utf-8")
     return chart_path
 
@@ -760,7 +810,7 @@ def write_outputs(
     note_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
     # SVGs
-    chart_path = _svg_parameter_coverage(reports_dir, top_params=top_params)
+    chart_path = _svg_parameter_coverage(reports_dir, report_date=report_date, top_params=top_params)
     map_path = _svg_map(
         reports_dir,
         ny_multipolygon=load_ny_multipolygon(cfg),
