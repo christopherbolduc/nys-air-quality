@@ -1,0 +1,23 @@
+# Secrets
+.env
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Python
+__pycache__/
+*.pyc
+*.py[cod]
+*.pyo
+*.pyd
+.pytest_cache/
+.mypy_cache/
+
+# packaging artifacts
+*.egg-info/
+dist/
+build/
+
+# OS / editor
+.DS_Store
+.vscode/
