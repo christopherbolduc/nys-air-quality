@@ -33,16 +33,25 @@ jobs:
           OPENAQ_API_KEY: ${{ secrets.OPENAQ_API_KEY }}
         run: |
           python scripts/run_daily.py
+        
+      - name: Compute report date (ET)
+        id: report_date
+        run: |
+          REPORT_DATE=$(TZ=America/New_York date -d "yesterday" +%F)
+          echo "report_date=$REPORT_DATE" >> "$GITHUB_OUTPUT"
+          echo "Report date: $REPORT_DATE"
 
       - name: Create pull request
         uses: peter-evans/create-pull-request@v7
         with:
-          commit-message: "Daily air quality update"
-          title: "Daily air quality update"
+          commit-message: "Daily AQ update — ${{ steps.report_date.outputs.report_date }}"
+          title: "Daily AQ update — ${{ steps.report_date.outputs.report_date }}"
           body: |
             Automated daily run (OpenAQ) with NY boundary filter.
+            Report date: ${{ steps.report_date.outputs.report_date }}
+
             Review artifacts in notes/ and reports/ and merge when ready.
-          branch: "automation/daily"
+          branch: "automation/daily-${{ steps.report_date.outputs.report_date }}"
           delete-branch: true
           labels: "automation"
           add-paths: |
