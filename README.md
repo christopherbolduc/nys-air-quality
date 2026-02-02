@@ -1,3 +1,5 @@
+[![Daily NYS Air Quality](https://github.com/christopherbolduc/nys-air-quality/actions/workflows/daily.yml/badge.svg)](https://github.com/christopherbolduc/nys-air-quality/actions/workflows/daily.yml)
+
 
 # NYS Air Quality (OpenAQ) — Daily Automation
 
