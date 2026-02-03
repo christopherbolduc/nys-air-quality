@@ -21,17 +21,17 @@
 <circle cx="590.78" cy="185.70" r="3.50" fill="lightgray" stroke="black" stroke-width="0.6"/>
 <circle cx="622.87" cy="131.07" r="3.50" fill="lightgray" stroke="black" stroke-width="0.6"/>
 <circle cx="358.12" cy="297.74" r="3.50" fill="lightgray" stroke="black" stroke-width="0.6"/>
-<circle cx="513.55" cy="223.53" r="5.00" fill="#FFFF00" stroke="black" stroke-width="0.6"/>
+<circle cx="513.55" cy="223.53" r="4.00" fill="#00E400" stroke="black" stroke-width="0.6"/>
 <circle cx="432.03" cy="118.56" r="3.50" fill="lightgray" stroke="black" stroke-width="0.6"/>
 <circle cx="260.84" cy="218.57" r="5.00" fill="#FFFF00" stroke="black" stroke-width="0.6"/>
 <circle cx="654.21" cy="462.50" r="5.00" fill="#FFFF00" stroke="black" stroke-width="0.6"/>
 <circle cx="657.44" cy="466.02" r="4.00" fill="#00E400" stroke="black" stroke-width="0.6"/>
-<circle cx="658.41" cy="475.49" r="5.00" fill="#FFFF00" stroke="black" stroke-width="0.6"/>
+<circle cx="658.41" cy="475.49" r="4.00" fill="#00E400" stroke="black" stroke-width="0.6"/>
 <circle cx="673.39" cy="268.40" r="3.50" fill="lightgray" stroke="black" stroke-width="0.6"/>
 <circle cx="301.67" cy="209.63" r="3.50" fill="lightgray" stroke="black" stroke-width="0.6"/>
-<circle cx="665.90" cy="474.36" r="4.00" fill="#00E400" stroke="black" stroke-width="0.6"/>
+<circle cx="665.90" cy="474.36" r="5.00" fill="#FFFF00" stroke="black" stroke-width="0.6"/>
 <circle cx="662.15" cy="86.14" r="4.00" fill="#00E400" stroke="black" stroke-width="0.6"/>
-<circle cx="672.45" cy="440.94" r="4.00" fill="#00E400" stroke="black" stroke-width="0.6"/>
+<circle cx="672.45" cy="440.94" r="5.00" fill="#FFFF00" stroke="black" stroke-width="0.6"/>
 <circle cx="684.96" cy="232.79" r="3.50" fill="lightgray" stroke="black" stroke-width="0.6"/>
 <circle cx="678.31" cy="398.05" r="3.50" fill="lightgray" stroke="black" stroke-width="0.6"/>
 <circle cx="648.49" cy="475.16" r="3.50" fill="rgb(180,180,180)" stroke="black" stroke-width="0.6"/>
@@ -64,8 +64,8 @@
 <circle cx="672.22" cy="471.51" r="3.50" fill="rgb(180,180,180)" stroke="black" stroke-width="0.6"/>
 <circle cx="666.37" cy="474.31" r="3.50" fill="rgb(180,180,180)" stroke="black" stroke-width="0.6"/>
 <circle cx="672.22" cy="471.51" r="3.50" fill="rgb(180,180,180)" stroke="black" stroke-width="0.6"/>
-<circle cx="685.35" cy="33.58" r="4.00" fill="#00E400" stroke="black" stroke-width="0.6"/>
-<circle cx="254.31" cy="218.69" r="7.00" fill="#FF0000" stroke="black" stroke-width="0.6"/>
+<circle cx="685.35" cy="33.58" r="5.00" fill="#FFFF00" stroke="black" stroke-width="0.6"/>
+<circle cx="254.31" cy="218.69" r="6.00" fill="#FF7E00" stroke="black" stroke-width="0.6"/>
 <circle cx="666.34" cy="474.37" r="3.50" fill="rgb(180,180,180)" stroke="black" stroke-width="0.6"/>
 <circle cx="666.37" cy="474.31" r="3.50" fill="rgb(180,180,180)" stroke="black" stroke-width="0.6"/>
 <circle cx="646.96" cy="474.10" r="4.00" fill="#00E400" stroke="black" stroke-width="0.6"/>
@@ -82,13 +82,13 @@
 <circle cx="656.27" cy="476.40" r="3.50" fill="rgb(180,180,180)" stroke="black" stroke-width="0.6"/>
 <circle cx="656.09" cy="476.47" r="3.50" fill="rgb(180,180,180)" stroke="black" stroke-width="0.6"/>
 <circle cx="668.37" cy="476.39" r="4.00" fill="#00E400" stroke="black" stroke-width="0.6"/>
-<circle cx="440.76" cy="326.68" r="5.00" fill="#FFFF00" stroke="black" stroke-width="0.6"/>
+<circle cx="440.76" cy="326.68" r="6.00" fill="#FF7E00" stroke="black" stroke-width="0.6"/>
 <circle cx="648.83" cy="470.23" r="5.00" fill="#FFFF00" stroke="black" stroke-width="0.6"/>
 <circle cx="672.22" cy="471.51" r="5.00" fill="#FFFF00" stroke="black" stroke-width="0.6"/>
 <circle cx="724.25" cy="215.50" r="3.50" fill="rgb(180,180,180)" stroke="black" stroke-width="0.6"/>
 <circle cx="668.69" cy="313.51" r="3.50" fill="rgb(180,180,180)" stroke="black" stroke-width="0.6"/>
 <circle cx="648.60" cy="476.10" r="3.50" fill="rgb(180,180,180)" stroke="black" stroke-width="0.6"/>
-<circle cx="661.73" cy="273.43" r="5.00" fill="#FFFF00" stroke="black" stroke-width="0.6"/>
+<circle cx="661.73" cy="273.43" r="4.00" fill="#00E400" stroke="black" stroke-width="0.6"/>
 <circle cx="649.63" cy="483.92" r="4.00" fill="#00E400" stroke="black" stroke-width="0.6"/>
 <circle cx="658.93" cy="374.64" r="4.00" fill="#00E400" stroke="black" stroke-width="0.6"/>
 <circle cx="696.56" cy="416.90" r="3.50" fill="rgb(180,180,180)" stroke="black" stroke-width="0.6"/>
@@ -100,7 +100,7 @@
 <circle cx="787.40" cy="466.95" r="4.00" fill="#00E400" stroke="black" stroke-width="0.6"/>
 <circle cx="663.71" cy="452.15" r="3.50" fill="rgb(180,180,180)" stroke="black" stroke-width="0.6"/>
 <circle cx="646.26" cy="477.62" r="5.00" fill="#FFFF00" stroke="black" stroke-width="0.6"/>
-<circle cx="649.82" cy="485.14" r="4.00" fill="#00E400" stroke="black" stroke-width="0.6"/>
+<circle cx="649.82" cy="485.14" r="5.00" fill="#FFFF00" stroke="black" stroke-width="0.6"/>
 <circle cx="648.41" cy="470.06" r="3.50" fill="rgb(180,180,180)" stroke="black" stroke-width="0.6"/>
 <rect x="20" y="374" width="330" height="118" fill="white" stroke="black" stroke-width="0.6"/>
 <text x="30" y="392" font-family="Arial, sans-serif" font-size="12">PM2.5 AQI categories</text>
