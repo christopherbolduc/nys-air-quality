@@ -727,6 +727,49 @@ def _svg_map(
     def color_for_t(t: float) -> str:
         return color_ramp(clamp01(t))
 
+    def _units_look_like_ugm3(u: str) -> bool:
+        uu = (u or "").strip().lower()
+        return ("µg" in uu) or ("ug/m" in uu) or ("ugm3" in uu) or ("ug" in uu and "m3" in uu)
+
+    def pm25_to_aqi(pm: float) -> int:
+        """
+        US EPA PM2.5 AQI breakpoints (µg/m³), piecewise linear.
+        """
+        # (Clow, Chigh, Ilow, Ihigh)
+        bps = [
+            (0.0, 12.0, 0, 50),
+            (12.1, 35.4, 51, 100),
+            (35.5, 55.4, 101, 150),
+            (55.5, 150.4, 151, 200),
+            (150.5, 250.4, 201, 300),
+            (250.5, 350.4, 301, 400),
+            (350.5, 500.4, 401, 500),
+        ]
+        x = max(0.0, float(pm))
+        for cl, ch, il, ih in bps:
+            if x <= ch:
+                return int(round(((ih - il) / (ch - cl)) * (x - cl) + il))
+        return 500
+
+    def pm25_category(aqi: int) -> tuple[str, str]:
+        """
+        Returns: (category_label, hex_color)
+        """
+        if aqi <= 50:
+            return ("Good (0–50)", "#00E400")
+        if aqi <= 100:
+            return ("Moderate (51–100)", "#FFFF00")
+        if aqi <= 150:
+            return ("Unhealthy for Sensitive Groups (101–150)", "#FF7E00")
+        if aqi <= 200:
+            return ("Unhealthy (151–200)", "#FF0000")
+        if aqi <= 300:
+            return ("Very Unhealthy (201–300)", "#8F3F97")
+        return ("Hazardous (301–500)", "#7E0023")
+
+    use_aqi = primary_param.strip().lower() == "pm25" and _units_look_like_ugm3(units)
+
+    # For non-AQI params, keep the old relative scaling (p5–p95)
     vals_fresh = [v for _, _, v, stale in points if isinstance(v, (int, float)) and (not stale)]
     vals_all = [v for _, _, v, _ in points if isinstance(v, (int, float))]
     scale_vals = vals_fresh if vals_fresh else vals_all
@@ -743,12 +786,30 @@ def _svg_map(
             return "lightgray"
         if stale:
             return "rgb(180,180,180)"
-        return color_ramp(value_to_t(v))
+        if use_aqi:
+            aqi = pm25_to_aqi(float(v))
+            _, col = pm25_category(aqi)
+            return col
+        return color_ramp(value_to_t(float(v)))
 
     def radius_for(v: float | None, stale: bool) -> float:
         if v is None or stale:
             return 3.5
-        t = value_to_t(v)
+        if use_aqi:
+            aqi = pm25_to_aqi(float(v))
+            # Slight emphasis by AQI category (keeps dots readable)
+            if aqi <= 50:
+                return 4.0
+            if aqi <= 100:
+                return 5.0
+            if aqi <= 150:
+                return 6.0
+            if aqi <= 200:
+                return 7.0
+            if aqi <= 300:
+                return 8.0
+            return 9.0
+        t = value_to_t(float(v))
         return 3.0 + t * 6.0  # 3 -> 9
 
     # Bounds from NY polygon
@@ -802,11 +863,13 @@ def _svg_map(
         x, y = project(lon, lat)
         fill = color_for(v, stale)
         r = radius_for(v, stale)
-        parts.append(f'<circle cx="{x:.2f}" cy="{y:.2f}" r="{r:.2f}" fill="{fill}" stroke="black" stroke-width="0.6"/>')
+        parts.append(
+            f'<circle cx="{x:.2f}" cy="{y:.2f}" r="{r:.2f}" fill="{fill}" stroke="black" stroke-width="0.6"/>'
+        )
 
-        # Legend box (bottom-left, above the footer line)
-    legend_w = 260
-    legend_h = 54
+    # Legend box (bottom-left, above the footer line)
+    legend_w = 330 if use_aqi else 260
+    legend_h = 118 if use_aqi else 54
     legend_x = pad
     legend_y = height - 18 - legend_h - 10  # 10px above footer
 
@@ -815,43 +878,76 @@ def _svg_map(
         f'fill="white" stroke="black" stroke-width="0.6"/>'
     )
 
-    parts.append(
-        f'<text x="{legend_x + 10}" y="{legend_y + 18}" font-family="Arial, sans-serif" font-size="12">'
-        f'{escape(pretty_parameter_name(primary_param))} scale ({escape(units)})'
-        f"</text>"
-    )
-
-    # Color ramp (left->right)
-    ramp_x0 = legend_x + 10
-    ramp_y0 = legend_y + 26
-    ramp_w = legend_w - 20
-    ramp_h = 10
-    steps = 24
-    step_w = ramp_w / steps
-
-    for i in range(steps):
-        t0 = i / steps
-        x = ramp_x0 + i * step_w
+    if use_aqi:
         parts.append(
-            f'<rect x="{x:.2f}" y="{ramp_y0:.2f}" width="{step_w + 0.6:.2f}" height="{ramp_h}" '
-            f'fill="{color_for_t(t0)}" stroke="none"/>'
+            f'<text x="{legend_x + 10}" y="{legend_y + 18}" font-family="Arial, sans-serif" font-size="12">'
+            f'PM2.5 AQI categories'
+            f"</text>"
         )
 
-    parts.append(
-        f'<text x="{ramp_x0:.2f}" y="{legend_y + 50}" font-family="Arial, sans-serif" font-size="11" fill="gray">'
-        f"{vmin:.2f}</text>"
-    )
-    parts.append(
-        f'<text x="{(ramp_x0 + ramp_w):.2f}" y="{legend_y + 50}" font-family="Arial, sans-serif" font-size="11" fill="gray" '
-        f'text-anchor="end">{vmax:.2f}</text>'
-    )
+        # (label, color, pm25_range)
+        cats = [
+            ("Good (0–50)", "#00E400", "0.0–12.0"),
+            ("Moderate (51–100)", "#FFFF00", "12.1–35.4"),
+            ("USG (101–150)", "#FF7E00", "35.5–55.4"),
+            ("Unhealthy (151–200)", "#FF0000", "55.5–150.4"),
+            ("Very Unhealthy (201–300)", "#8F3F97", "150.5–250.4"),
+            ("Hazardous (301–500)", "#7E0023", "250.5+"),
+        ]
 
-    # Footer line (kept, now below legend)
-    parts.append(
-        f'<text x="{pad}" y="{height - 18}" font-family="Arial, sans-serif" font-size="12" fill="gray">'
-        f"Scale uses p5–p95; stale points shown in gray"
-        f"</text>"
-    )
+        y = legend_y + 30
+        for label, col, rng in cats:
+            parts.append(f'<rect x="{legend_x + 10}" y="{y - 10}" width="12" height="12" fill="{col}" stroke="black" stroke-width="0.4"/>')
+            parts.append(
+                f'<text x="{legend_x + 28}" y="{y}" font-family="Arial, sans-serif" font-size="11">'
+                f'{escape(label)}  (µg/m³: {escape(rng)})'
+                f"</text>"
+            )
+            y += 14
+
+        parts.append(
+            f'<text x="{pad}" y="{height - 18}" font-family="Arial, sans-serif" font-size="12" fill="gray">'
+            f"Stale points shown in gray"
+            f"</text>"
+        )
+    else:
+        parts.append(
+            f'<text x="{legend_x + 10}" y="{legend_y + 18}" font-family="Arial, sans-serif" font-size="12">'
+            f'{escape(pretty_parameter_name(primary_param))} scale ({escape(units)})'
+            f"</text>"
+        )
+
+        # Color ramp (left->right)
+        ramp_x0 = legend_x + 10
+        ramp_y0 = legend_y + 26
+        ramp_w = legend_w - 20
+        ramp_h = 10
+        steps = 24
+        step_w = ramp_w / steps
+
+        for i in range(steps):
+            t0 = i / steps
+            x = ramp_x0 + i * step_w
+            parts.append(
+                f'<rect x="{x:.2f}" y="{ramp_y0:.2f}" width="{step_w + 0.6:.2f}" height="{ramp_h}" '
+                f'fill="{color_for_t(t0)}" stroke="none"/>'
+            )
+
+        parts.append(
+            f'<text x="{ramp_x0:.2f}" y="{legend_y + 50}" font-family="Arial, sans-serif" font-size="11" fill="gray">'
+            f"{vmin:.2f}</text>"
+        )
+        parts.append(
+            f'<text x="{(ramp_x0 + ramp_w):.2f}" y="{legend_y + 50}" font-family="Arial, sans-serif" font-size="11" fill="gray" '
+            f'text-anchor="end">{vmax:.2f}</text>'
+        )
+
+        parts.append(
+            f'<text x="{pad}" y="{height - 18}" font-family="Arial, sans-serif" font-size="12" fill="gray">'
+            f"Scale uses p5–p95; stale points shown in gray"
+            f"</text>"
+        )
+
     parts.append("</svg>")
 
     map_path.write_text("\n".join(parts) + "\n", encoding="utf-8")
