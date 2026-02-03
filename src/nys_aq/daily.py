@@ -1041,6 +1041,10 @@ def write_outputs(
     }
     _upsert_daily_csv(csv_path, report_date=report_date, row=csv_row)
 
+    def _rel_md_link(target: Path, note_path: Path) -> str:
+        rel = os.path.relpath(target, start=note_path.parent).replace(os.sep, "/")
+        return rel
+
     # Note (overwrite per day)
     note_path = notes_dir / f"{report_date}.md"
     lines: list[str] = []
