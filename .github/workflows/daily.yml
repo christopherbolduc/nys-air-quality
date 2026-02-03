@@ -33,7 +33,16 @@ jobs:
           OPENAQ_API_KEY: ${{ secrets.OPENAQ_API_KEY }}
         run: |
           python scripts/run_daily.py
-        
+      
+      - name: Update latest report SVGs
+        env:
+          REPORT_DATE: ${{ steps.report_date.outputs.report_date }}
+        run: |
+          set -euo pipefail
+          mkdir -p reports/latest
+          cp "reports/$REPORT_DATE/map.svg" "reports/latest/map.svg"
+          cp "reports/$REPORT_DATE/parameter_coverage.svg" "reports/latest/parameter_coverage.svg"
+
       - name: Compute report date (ET)
         id: report_date
         run: |
@@ -59,3 +68,4 @@ jobs:
             data/sensor_meta_cache.json
             notes/
             reports/
+            reports/latest/
