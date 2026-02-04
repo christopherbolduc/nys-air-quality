@@ -75,6 +75,7 @@ Daily notes and reports are generated in GitHub Actions and merged via pull requ
 ### Requirements
 - Python 3.11+
 - An OpenAQ API key
+- Dependencies: `requests`, `tzdata`, `pandas`
 
 ### Install
 ```bash
