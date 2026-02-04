@@ -1,5 +1,5 @@
 report_date,report_tz,generated_at_utc,bbox,ny_locations,sampled_locations,measurements_total,stale_hours,stale_fraction,locations_latency_ms,latest_elapsed_s,top_parameters,primary_parameter,primary_units
 2026-01-30,America/New_York,2026-01-31T21:08:52.704181Z,"-79.8,40.45,-71.85,45.1",93,93,277,12,0.5379,484,109.66,pm25:73;pm1:41;o3:31;pm10:22;no2:2;so2:2,pm25,µg/m³
 2026-01-31,America/New_York,2026-02-01T11:19:35.507804Z,"-79.8,40.45,-71.85,45.1",93,93,277,12,0.5415,572,108.59,pm25:73;pm1:41;o3:31;pm10:22;no2:2;so2:2,pm25,µg/m³
-2026-02-01,America/New_York,2026-02-02T11:34:21.137766Z,"-79.8,40.45,-71.85,45.1",93,93,277,12,0.5379,555,109.22,pm25:73;pm1:41;o3:31;pm10:22;no2:2;so2:2,pm25,µg/m³
-2026-02-02,America/New_York,2026-02-03T18:22:34.526484Z,"-79.8,40.45,-71.85,45.1",93,93,277,12,0.5235,888,117.42,pm25:73;pm1:41;o3:31;pm10:22;no2:2;so2:2,pm25,µg/m³
+2026-02-01,America/New_York,2026-02-04T03:27:37.936206Z,"-79.8,40.45,-71.85,45.1",93,93,277,12,0.5199,410,108.40,pm25:73;pm1:41;o3:31;pm10:22;no2:2;so2:2,pm25,µg/m³
+2026-02-02,America/New_York,2026-02-04T03:16:29.505303Z,"-79.8,40.45,-71.85,45.1",93,93,277,12,0.5199,473,108.44,pm25:73;pm1:41;o3:31;pm10:22;no2:2;so2:2,pm25,µg/m³

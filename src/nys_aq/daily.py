@@ -1082,10 +1082,19 @@ def write_outputs(
         lines.append(
             "PM2.5 is a measure of very small airborne particles (2.5 micrometers or smaller) that can be breathed deep into the lungs."
         )
+
     lines.append("")
     lines.append("## Reports")
-    lines.append(f"- reports/{report_date}/parameter_coverage.svg")
-    lines.append(f"- reports/{report_date}/map.svg")
+
+    coverage_path = reports_dir / "parameter_coverage.svg"
+    map_path = reports_dir / "map.svg"
+
+    cov_link = os.path.relpath(coverage_path, start=note_path.parent).replace(os.sep, "/")
+    map_link = os.path.relpath(map_path, start=note_path.parent).replace(os.sep, "/")
+
+    lines.append(f"- [Parameter coverage]({cov_link}?raw=1)")
+    lines.append(f"- [Map]({map_link}?raw=1)")
+
     note_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
     # SVGs
