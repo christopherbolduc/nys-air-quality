@@ -1092,8 +1092,8 @@ def write_outputs(
     cov_link = os.path.relpath(coverage_path, start=note_path.parent).replace(os.sep, "/")
     map_link = os.path.relpath(map_path, start=note_path.parent).replace(os.sep, "/")
 
-    lines.append(f"- [Parameter coverage]({cov_link}?raw=1)")
-    lines.append(f"- [Map]({map_link}?raw=1)")
+    lines.append(f"- [Parameter coverage]({cov_link})")
+    lines.append(f"- [Map]({map_link})")
 
     note_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
