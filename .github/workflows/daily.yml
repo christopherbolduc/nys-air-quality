@@ -20,6 +20,7 @@ jobs:
       - name: Compute report date (ET)
         id: report_date
         run: |
+          set -euo pipefail
           REPORT_DATE=$(TZ=America/New_York date -d "yesterday" +%F)
           echo "report_date=$REPORT_DATE" >> "$GITHUB_OUTPUT"
           echo "Report date: $REPORT_DATE"
@@ -32,14 +33,35 @@ jobs:
 
       - name: Install
         run: |
+          set -euo pipefail
           python -m pip install --upgrade pip
           python -m pip install -e .
 
       - name: Run daily job
+        id: daily_run
         env:
           OPENAQ_API_KEY: ${{ secrets.OPENAQ_API_KEY }}
         run: |
-          python scripts/run_daily.py
+          set -euo pipefail
+          python scripts/run_daily.py | tee daily_run.log
+
+          pruned_notes=0
+          pruned_report_dirs=0
+          retention_days=""
+
+          if grep -q "^pruned_notes:" daily_run.log; then
+            pruned_notes=$(grep "^pruned_notes:" daily_run.log | tail -1 | awk '{print $2}')
+          fi
+          if grep -q "^pruned_report_dirs:" daily_run.log; then
+            pruned_report_dirs=$(grep "^pruned_report_dirs:" daily_run.log | tail -1 | awk '{print $2}')
+          fi
+          if grep -q "^retention_days:" daily_run.log; then
+            retention_days=$(grep "^retention_days:" daily_run.log | tail -1 | awk '{print $2}')
+          fi
+
+          echo "pruned_notes=$pruned_notes" >> "$GITHUB_OUTPUT"
+          echo "pruned_report_dirs=$pruned_report_dirs" >> "$GITHUB_OUTPUT"
+          echo "retention_days=$retention_days" >> "$GITHUB_OUTPUT"
 
       - name: Update latest report SVGs
         env:
@@ -58,6 +80,16 @@ jobs:
           body: |
             Automated daily run (OpenAQ) with NY boundary filter.
             Report date: ${{ steps.report_date.outputs.report_date }}
+
+            Artifacts:
+            - notes/${{ steps.report_date.outputs.report_date }}.md
+            - reports/${{ steps.report_date.outputs.report_date }}/
+            - reports/latest/
+
+            Pruning (retention):
+            - Deleted notes: ${{ steps.daily_run.outputs.pruned_notes }}
+            - Deleted report folders: ${{ steps.daily_run.outputs.pruned_report_dirs }}
+            - Retention days: ${{ steps.daily_run.outputs.retention_days }}
 
             Review artifacts in notes/ and reports/ and merge when ready.
           branch: "automation/daily-${{ steps.report_date.outputs.report_date }}"
