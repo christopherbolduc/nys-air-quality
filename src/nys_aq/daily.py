@@ -1,3 +1,4 @@
+
 """
 Daily run logic for NYS air quality snapshots.
 
@@ -10,6 +11,7 @@ from __future__ import annotations
 
 import csv
 import os
+import shutil
 from dataclasses import dataclass
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
@@ -24,7 +26,7 @@ class DailyConfig:
     run_date: date
     repo_root: Path
     ny_boundary_geojson: Path
-
+    retention_days: int
     _api_key: str
 
     @property
@@ -40,6 +42,7 @@ class DailyConfig:
             f"run_date={self.run_date!r}, "
             f"repo_root={str(self.repo_root)!r}, "
             f"ny_boundary_geojson={str(self.ny_boundary_geojson)!r}, "
+            f"retention_days={self.retention_days!r}, "
             "_api_key='***'"
             ")"
         )
@@ -83,6 +86,7 @@ def load_config(
     - BBOX (optional; performance hint)
     - SAMPLE_SIZE (optional)
     - STALE_HOURS (optional)
+    - RETENTION_DAYS (optional; delete notes/reports older than this many days; default 91)
     """
     root = (repo_root or Path(__file__).resolve().parents[2]).resolve()
 
@@ -95,6 +99,7 @@ def load_config(
     bbox = os.getenv("BBOX", "-79.8,40.45,-71.85,45.1")
     sample_size = int(os.getenv("SAMPLE_SIZE", "100"))
     stale_hours = int(os.getenv("STALE_HOURS", "12"))
+    retention_days = int(os.getenv("RETENTION_DAYS", "91"))
 
     tz = ZoneInfo(tz_name)
     effective_date = run_date or _default_run_date(tz)
@@ -110,8 +115,54 @@ def load_config(
         run_date=effective_date,
         repo_root=root,
         ny_boundary_geojson=ny_geojson,
+        retention_days=retention_days,
         _api_key=api_key,
     )
+
+
+def _parse_ymd(s: str) -> date | None:
+    try:
+        return date.fromisoformat(s)
+    except ValueError:
+        return None
+
+
+def prune_old_artifacts(cfg: DailyConfig) -> dict[str, int]:
+    """
+    Delete note/report artifacts older than cfg.retention_days.
+    Only affects:
+      - notes/YYYY-MM-DD.md
+      - reports/YYYY-MM-DD/...
+    Never touches:
+      - data/daily.csv
+      - reports/latest/
+    """
+    notes_dir = cfg.repo_root / "notes"
+    reports_root = cfg.repo_root / "reports"
+    cutoff = cfg.run_date - timedelta(days=cfg.retention_days)
+
+    deleted_notes = 0
+    deleted_report_dirs = 0
+
+    if notes_dir.exists():
+        for p in notes_dir.glob("*.md"):
+            d = _parse_ymd(p.stem)
+            if d is not None and d < cutoff:
+                p.unlink(missing_ok=True)
+                deleted_notes += 1
+
+    if reports_root.exists():
+        for p in reports_root.iterdir():
+            if not p.is_dir():
+                continue
+            if p.name == "latest":
+                continue
+            d = _parse_ymd(p.name)
+            if d is not None and d < cutoff:
+                shutil.rmtree(p, ignore_errors=True)
+                deleted_report_dirs += 1
+
+    return {"deleted_notes": deleted_notes, "deleted_report_dirs": deleted_report_dirs}
 
 
 def fetch_locations(cfg: DailyConfig) -> tuple[int, list[dict]]:
@@ -1157,7 +1208,6 @@ def run_daily(*, run_date: date | None = None, tz_name: str = "America/New_York"
     print("sensor_lookup_elapsed_s:", round(sensor_elapsed_s, 2))
 
     pollutant_allowlist = {
-        # Core criteria pollutants (OpenAQ focus)
         "pm25",
         "pm10",
         "so2",
@@ -1165,7 +1215,6 @@ def run_daily(*, run_date: date | None = None, tz_name: str = "America/New_York"
         "co",
         "o3",
         "bc",
-        # Limited set extras OpenAQ mentions
         "pm1",
         "pm4",
         "co2",
@@ -1183,7 +1232,6 @@ def run_daily(*, run_date: date | None = None, tz_name: str = "America/New_York"
 
     top_params = sorted(pollutant_counts.items(), key=lambda kv: (-kv[1], kv[0]))[:10]
 
-    # Fallback: if none of the allowlisted pollutants appear, show the top parameters overall
     if not top_params:
         all_counts: dict[str, int] = {}
         for r in rows:
@@ -1206,5 +1254,11 @@ def run_daily(*, run_date: date | None = None, tz_name: str = "America/New_York"
     print("wrote_note:", outputs["note"])
     print("wrote_chart:", outputs["chart"])
     print("wrote_map:", outputs["map"])
+
+    pruned = prune_old_artifacts(cfg)
+    if pruned["deleted_notes"] or pruned["deleted_report_dirs"]:
+        print("pruned_notes:", pruned["deleted_notes"])
+        print("pruned_report_dirs:", pruned["deleted_report_dirs"])
+        print("retention_days:", cfg.retention_days)
 
     return cfg

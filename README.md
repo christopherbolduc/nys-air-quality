@@ -70,6 +70,17 @@ Repo Settings → Secrets and variables → Actions → New repository secret.
 
 Daily notes and reports are generated in GitHub Actions and merged via pull request. The repository treats `notes/`, `reports/`, and `data/daily.csv` as build outputs produced by CI (not hand-edited).
 
+## Artifact retention (automatic pruning)
+
+To keep the repository readable over time, the daily job automatically removes older generated artifacts:
+
+- `notes/YYYY-MM-DD.md`
+- `reports/YYYY-MM-DD/` (daily SVG outputs)
+
+The CSV summary (`data/daily.csv`) is retained indefinitely so longer-term trends can still be analyzed.
+
+Retention is controlled by `RETENTION_DAYS` (default: 91). This keeps roughly a quarter’s worth of daily snapshots visible for review while preventing the repo from accumulating unlimited artifacts.
+
 ## Local setup
 
 ### Requirements
@@ -96,6 +107,9 @@ Set:
 Optional configuration (via `.env` or environment variables):
 
 - `MAP_PARAM` — OpenAQ parameter code used to color the map (defaults to the day’s most common pollutant parameter)
+
+Optional:
+- `RETENTION_DAYS` (default: 91) — delete notes/reports older than this many days
 
 ## Run locally
 Default behavior generates a report for yesterday in `America/New_York`:
