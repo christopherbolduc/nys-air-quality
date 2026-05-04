@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="980" height="420">
 <rect x="0" y="0" width="980" height="420" fill="white"/>
-<text x="230" y="26" font-family="Arial, sans-serif" font-size="18">Pollutant coverage — 2 May, 2026</text>
+<text x="230" y="26" font-family="Arial, sans-serif" font-size="18">Pollutant coverage — 3 May, 2026</text>
 <text x="230" y="48" font-family="Arial, sans-serif" font-size="12" fill="gray">Counts returned by OpenAQ / latest across the NY daily sample (top 6). Total shown: 183.</text>
 <line x1="230" y1="70" x2="230" y2="370" stroke="black"/>
 <line x1="230" y1="370" x2="940" y2="370" stroke="black"/>
