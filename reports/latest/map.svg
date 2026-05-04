@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="900" height="520">
 <rect x="0" y="0" width="900" height="520" fill="white"/>
 <text x="20" y="18" font-family="Arial, sans-serif" font-size="16">New York State — PM2.5 (latest)</text>
-<text x="20" y="36" font-family="Arial, sans-serif" font-size="12" fill="gray">2026-05-02 • All NY locations (with coordinates) • fresh: 49 • stale: 30 • missing: 20</text>
+<text x="20" y="36" font-family="Arial, sans-serif" font-size="12" fill="gray">2026-05-03 • All NY locations (with coordinates) • fresh: 49 • stale: 30 • missing: 20</text>
 <path d="M671.45,461.41 L671.76,461.32 L672.22,461.64 L672.35,461.97 L672.25,462.95 L671.86,462.98 L671.49,462.62 L671.42,461.90 L671.45,461.41 Z" fill="none" stroke="black" stroke-width="1"/>
 <path d="M642.36,478.33 L642.45,478.27 L642.52,478.30 L642.67,478.45 L642.08,479.44 L641.97,479.57 L641.76,479.50 L641.65,479.36 L641.70,479.29 L642.36,478.33 Z" fill="none" stroke="black" stroke-width="1"/>
 <path d="M631.09,495.85 L630.63,495.92 L629.30,496.74 L627.44,497.50 L626.99,497.39 L625.05,498.34 L623.91,498.58 L622.89,499.31 L621.43,499.45 L619.97,500.00 L619.59,499.94 L619.11,499.34 L618.94,498.75 L619.31,498.11 L620.38,497.37 L620.51,496.26 L619.84,494.98 L621.89,493.74 L623.20,493.75 L623.86,493.12 L624.60,490.10 L625.39,489.28 L625.54,488.77 L625.47,487.25 L624.94,487.17 L624.85,486.89 L624.98,485.63 L626.20,484.49 L627.20,484.13 L627.86,484.18 L628.29,484.48 L630.16,484.84 L633.73,484.48 L637.39,483.80 L638.55,483.86 L639.22,484.59 L639.45,486.43 L640.24,487.69 L641.02,488.58 L640.36,489.66 L639.38,490.65 L636.92,492.53 L634.68,494.60 L634.55,494.53 L633.57,495.05 L631.87,496.39 L631.55,496.00 L631.09,495.85 Z" fill="none" stroke="black" stroke-width="1"/>
