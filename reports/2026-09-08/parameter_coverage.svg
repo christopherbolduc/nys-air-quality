@@ -1,9 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1040" height="460">
 <rect x="0" y="0" width="1040" height="460" fill="#F7F5EF"/>
 <rect x="16" y="16" width="1008" height="428" rx="18" ry="18" fill="#FFFFFF" stroke="#E3E8EE" stroke-width="1"/>
-<text x="36" y="48" font-family="Public Sans, Inter, Aptos, Segoe UI, Arial, sans-serif" font-size="22" font-weight="600" fill="#1F2933">Pollutant coverage — 8 June, 2026</text>
+<text x="36" y="48" font-family="Public Sans, Inter, Aptos, Segoe UI, Arial, sans-serif" font-size="22" font-weight="600" fill="#1F2933">Pollutant coverage — 8 September, 2026</text>
 <text x="36" y="72" font-family="Public Sans, Inter, Aptos, Segoe UI, Arial, sans-serif" font-size="12.5" font-weight="400" fill="#607080">Counts returned by OpenAQ / latest across the NY daily sample. Top 6 parameters shown.</text>
-<text x="1004" y="47" font-family="Public Sans, Inter, Aptos, Segoe UI, Arial, sans-serif" font-size="12" text-anchor="end" fill="#1F2933">Total measurements: 184</text>
+<text x="1004" y="47" font-family="Public Sans, Inter, Aptos, Segoe UI, Arial, sans-serif" font-size="12" text-anchor="end" fill="#1F2933">Total measurements: 178</text>
 <line x1="180" y1="94" x2="180" y2="402" stroke="#6B7A86" stroke-width="1"/>
 <line x1="180" y1="402" x2="920" y2="402" stroke="#6B7A86" stroke-width="1"/>
 <line x1="180.00" y1="94" x2="180.00" y2="402" stroke="#D7DDE3" stroke-width="1"/>
@@ -19,22 +19,22 @@
 <text x="550.00" y="442" font-family="Inter, Aptos, Segoe UI, Arial, sans-serif" font-size="12" text-anchor="middle" fill="#607080">measurement count</text>
 <text x="168" y="111" font-family="Inter, Aptos, Segoe UI, Arial, sans-serif" font-size="12" text-anchor="end" fill="#1F2933">pm25</text>
 <rect x="180" y="94" width="740.00" height="22" rx="6" ry="6" fill="#0F4C5C" stroke="#2A6F97" stroke-width="0.8"/>
-<text x="914.00" y="111" font-family="Inter, Aptos, Segoe UI, Arial, sans-serif" font-size="12" fill="white" text-anchor="end">80 (43%)</text>
+<text x="914.00" y="111" font-family="Inter, Aptos, Segoe UI, Arial, sans-serif" font-size="12" fill="white" text-anchor="end">83 (47%)</text>
 <text x="168" y="145" font-family="Inter, Aptos, Segoe UI, Arial, sans-serif" font-size="12" text-anchor="end" fill="#1F2933">pm1</text>
-<rect x="180" y="128" width="453.25" height="22" rx="6" ry="6" fill="#0F4C5C" stroke="#2A6F97" stroke-width="0.8"/>
-<text x="641.25" y="145" font-family="Inter, Aptos, Segoe UI, Arial, sans-serif" font-size="12" fill="#1F2933">49 (27%)</text>
+<rect x="180" y="128" width="499.28" height="22" rx="6" ry="6" fill="#0F4C5C" stroke="#2A6F97" stroke-width="0.8"/>
+<text x="687.28" y="145" font-family="Inter, Aptos, Segoe UI, Arial, sans-serif" font-size="12" fill="#1F2933">56 (31%)</text>
 <text x="168" y="179" font-family="Inter, Aptos, Segoe UI, Arial, sans-serif" font-size="12" text-anchor="end" fill="#1F2933">o3</text>
-<rect x="180" y="162" width="286.75" height="22" rx="6" ry="6" fill="#0F4C5C" stroke="#2A6F97" stroke-width="0.8"/>
-<text x="474.75" y="179" font-family="Inter, Aptos, Segoe UI, Arial, sans-serif" font-size="12" fill="#1F2933">31 (17%)</text>
+<rect x="180" y="162" width="222.89" height="22" rx="6" ry="6" fill="#0F4C5C" stroke="#2A6F97" stroke-width="0.8"/>
+<text x="410.89" y="179" font-family="Inter, Aptos, Segoe UI, Arial, sans-serif" font-size="12" fill="#1F2933">25 (14%)</text>
 <text x="168" y="213" font-family="Inter, Aptos, Segoe UI, Arial, sans-serif" font-size="12" text-anchor="end" fill="#1F2933">pm10</text>
-<rect x="180" y="196" width="185.00" height="22" rx="6" ry="6" fill="#0F4C5C" stroke="#2A6F97" stroke-width="0.8"/>
-<text x="373.00" y="213" font-family="Inter, Aptos, Segoe UI, Arial, sans-serif" font-size="12" fill="#1F2933">20 (11%)</text>
+<rect x="180" y="196" width="98.07" height="22" rx="6" ry="6" fill="#0F4C5C" stroke="#2A6F97" stroke-width="0.8"/>
+<text x="286.07" y="213" font-family="Inter, Aptos, Segoe UI, Arial, sans-serif" font-size="12" fill="#1F2933">11 (6%)</text>
 <text x="168" y="247" font-family="Inter, Aptos, Segoe UI, Arial, sans-serif" font-size="12" text-anchor="end" fill="#1F2933">no2</text>
-<rect x="180" y="230" width="18.50" height="22" rx="6" ry="6" fill="#0F4C5C" stroke="#2A6F97" stroke-width="0.8"/>
-<text x="206.50" y="247" font-family="Inter, Aptos, Segoe UI, Arial, sans-serif" font-size="12" fill="#1F2933">2 (1%)</text>
+<rect x="180" y="230" width="17.83" height="22" rx="6" ry="6" fill="#0F4C5C" stroke="#2A6F97" stroke-width="0.8"/>
+<text x="205.83" y="247" font-family="Inter, Aptos, Segoe UI, Arial, sans-serif" font-size="12" fill="#1F2933">2 (1%)</text>
 <text x="168" y="281" font-family="Inter, Aptos, Segoe UI, Arial, sans-serif" font-size="12" text-anchor="end" fill="#1F2933">so2</text>
-<rect x="180" y="264" width="18.50" height="22" rx="6" ry="6" fill="#0F4C5C" stroke="#2A6F97" stroke-width="0.8"/>
-<text x="206.50" y="281" font-family="Inter, Aptos, Segoe UI, Arial, sans-serif" font-size="12" fill="#1F2933">2 (1%)</text>
+<rect x="180" y="264" width="8.92" height="22" rx="6" ry="6" fill="#0F4C5C" stroke="#2A6F97" stroke-width="0.8"/>
+<text x="196.92" y="281" font-family="Inter, Aptos, Segoe UI, Arial, sans-serif" font-size="12" fill="#1F2933">1 (1%)</text>
 <rect x="600.00" y="268.00" width="308" height="122" rx="12" ry="12" fill="#FBFCFD" stroke="#D8E0E7" stroke-width="1"/>
 <text x="612.00" y="291.00" font-family="Inter, Aptos, Segoe UI, Arial, sans-serif" font-size="11" fill="#1F2933">Dictionary</text>
 <text x="612.00" y="305.00" font-family="Inter, Aptos, Segoe UI, Arial, sans-serif" font-size="11" fill="#1F2933">PM2.5: fine particles ≤2.5 µm</text>
