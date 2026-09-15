@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1040" height="460">
 <rect x="0" y="0" width="1040" height="460" fill="#F7F5EF"/>
 <rect x="16" y="16" width="1008" height="428" rx="18" ry="18" fill="#FFFFFF" stroke="#E3E8EE" stroke-width="1"/>
-<text x="36" y="48" font-family="Public Sans, Inter, Aptos, Segoe UI, Arial, sans-serif" font-size="22" font-weight="600" fill="#1F2933">Pollutant coverage — 13 September, 2026</text>
+<text x="36" y="48" font-family="Public Sans, Inter, Aptos, Segoe UI, Arial, sans-serif" font-size="22" font-weight="600" fill="#1F2933">Pollutant coverage — 14 September, 2026</text>
 <text x="36" y="72" font-family="Public Sans, Inter, Aptos, Segoe UI, Arial, sans-serif" font-size="12.5" font-weight="400" fill="#607080">Counts returned by OpenAQ / latest across the NY daily sample. Top 6 parameters shown.</text>
 <text x="1004" y="47" font-family="Public Sans, Inter, Aptos, Segoe UI, Arial, sans-serif" font-size="12" text-anchor="end" fill="#1F2933">Total measurements: 179</text>
 <line x1="180" y1="94" x2="180" y2="402" stroke="#6B7A86" stroke-width="1"/>
