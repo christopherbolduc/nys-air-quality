@@ -3,7 +3,7 @@
 <rect x="14" y="14" width="932" height="532" rx="18" ry="18" fill="#FFFFFF" stroke="#E4E8EE" stroke-width="1"/>
 <rect x="28" y="14" width="904" height="64" rx="16" ry="16" fill="#FBFCFD" stroke="#E1E6EB" stroke-width="1"/>
 <text x="46" y="40" font-family="Public Sans, Inter, Aptos, Segoe UI, Arial, sans-serif" font-size="23" font-weight="600" fill="#1F2933">New York State — PM2.5 (latest)</text>
-<text x="46" y="62" font-family="Public Sans, Inter, Aptos, Segoe UI, Arial, sans-serif" font-size="12.5" font-weight="400" fill="#607080">2026-09-24 • Stable sample (100 of 123 NY locations) • fresh: 58 • stale: 25 • missing: 40</text>
+<text x="46" y="62" font-family="Public Sans, Inter, Aptos, Segoe UI, Arial, sans-serif" font-size="12.5" font-weight="400" fill="#607080">2026-09-25 • Stable sample (100 of 123 NY locations) • fresh: 57 • stale: 26 • missing: 40</text>
 <path d="M601.06,426.90 L601.23,426.83 L601.48,427.07 L601.55,427.32 L601.50,428.06 L601.28,428.08 L601.08,427.81 L601.04,427.27 L601.06,426.90 Z" fill="#EEF2EA" stroke="#1F2933" stroke-width="1.25" stroke-linejoin="round"/>
 <path d="M585.16,439.66 L585.21,439.61 L585.24,439.63 L585.33,439.75 L585.00,440.50 L584.94,440.59 L584.83,440.54 L584.77,440.43 L584.80,440.38 L585.16,439.66 Z" fill="#EEF2EA" stroke="#1F2933" stroke-width="1.25" stroke-linejoin="round"/>
 <path d="M579.00,452.87 L578.74,452.93 L578.02,453.54 L577.00,454.12 L576.75,454.04 L575.70,454.75 L575.07,454.93 L574.52,455.48 L573.72,455.58 L572.92,456.00 L572.71,455.95 L572.45,455.50 L572.36,455.05 L572.56,454.57 L573.14,454.01 L573.21,453.18 L572.85,452.21 L573.97,451.28 L574.68,451.28 L575.04,450.81 L575.45,448.53 L575.88,447.92 L575.97,447.53 L575.92,446.38 L575.63,446.32 L575.58,446.12 L575.66,445.16 L576.32,444.30 L576.87,444.03 L577.23,444.07 L577.46,444.30 L578.49,444.56 L580.44,444.30 L582.44,443.79 L583.07,443.83 L583.44,444.38 L583.57,445.77 L584.00,446.72 L584.43,447.38 L584.07,448.20 L583.53,448.95 L582.19,450.36 L580.96,451.93 L580.89,451.88 L580.35,452.27 L579.42,453.28 L579.25,452.99 L579.00,452.87 Z" fill="#EEF2EA" stroke="#1F2933" stroke-width="1.25" stroke-linejoin="round"/>
@@ -117,7 +117,7 @@
 <circle cx="390.54" cy="237.77" r="4.00" fill="#00E400" stroke="#24313A" stroke-width="0.75"/>
 <circle cx="589.36" cy="441.38" r="4.00" fill="#00E400" stroke="#24313A" stroke-width="0.75"/>
 <circle cx="450.72" cy="245.33" r="4.00" fill="#00E400" stroke="#24313A" stroke-width="0.75"/>
-<circle cx="444.62" cy="254.28" r="4.00" fill="#00E400" stroke="#24313A" stroke-width="0.75"/>
+<circle cx="444.62" cy="254.28" r="3.50" fill="rgb(180,180,180)" stroke="#24313A" stroke-width="0.75"/>
 <circle cx="379.36" cy="251.88" r="4.00" fill="#00E400" stroke="#24313A" stroke-width="0.75"/>
 <circle cx="594.02" cy="427.45" r="4.00" fill="#00E400" stroke="#24313A" stroke-width="0.75"/>
 <circle cx="592.46" cy="435.94" r="3.50" fill="rgb(180,180,180)" stroke="#24313A" stroke-width="0.75"/>
