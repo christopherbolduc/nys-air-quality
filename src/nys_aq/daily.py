@@ -303,7 +303,9 @@ def _get_with_backoff(session, url: str, *, max_attempts: int = 8, timeout_s: in
     raise RuntimeError(f"Rate-limited too long: {url}")
 
 
-def fetch_latest_for_locations(cfg: DailyConfig, location_ids: list[int]) -> tuple[list[dict], list[tuple[int, str]], float]:
+def fetch_latest_for_locations(
+    cfg: DailyConfig, location_ids: list[int], *, request_records: list[dict] | None = None,
+) -> tuple[list[dict], list[tuple[int, str]], float]:
     """
     Fetch latest measurements for each location id.
     Returns (payloads_ok, errors, elapsed_seconds).
@@ -322,10 +324,18 @@ def fetch_latest_for_locations(cfg: DailyConfig, location_ids: list[int]) -> tup
     t0 = time.time()
     for loc_id in location_ids:
         url = f"{base}/locations/{loc_id}/latest"
+        record = {"location_id": loc_id, "started_at_utc": datetime.now(timezone.utc).isoformat()}
         try:
-            ok.append(_get_with_backoff(session, url))
+            payload = _get_with_backoff(session, url)
+            ok.append(payload)
+            record["outcome"] = "measurements" if payload.get("results") else "empty"
         except Exception as e:
             errors.append((loc_id, str(e)))
+            # Store only the exception class, not URLs or credential-bearing messages.
+            record.update(outcome="failed", error_type=type(e).__name__)
+        record["ended_at_utc"] = datetime.now(timezone.utc).isoformat()
+        if request_records is not None:
+            request_records.append(record)
 
         # Keep under common minute-level limits; reliable > fast.
         time.sleep(1.05)
@@ -729,324 +739,149 @@ def _svg_map(
     rows: list[dict],
     primary_param: str,
     units: str,
+    collection_started_at: datetime | None = None,
+    collection_ended_at: datetime | None = None,
+    stale_hours: int = 12,
 ) -> Path:
+    """Draw concentrations on a snapshot-relative scale, never AQI categories."""
     import math
     from xml.sax.saxutils import escape
 
-    map_path = report_dir / "map.svg"
+    from nys_aq.snapshot import parse_observation_time, utc_text
 
-    # Latest value per location for the primary parameter
-    loc_value: dict[int, tuple[float, str, bool]] = {}
-    for r in rows:
-        if (r.get("parameter_name") or "unknown") != primary_param:
+    # Select the newest timestamp per location before validating its value. An
+    # invalid latest value must not silently fall back to an older clean value.
+    candidates: dict[int, list[tuple[datetime, dict]]] = {}
+    for row in rows:
+        if row.get("parameter_name") != primary_param:
             continue
-        loc_id = r.get("locationsId")
-        val = r.get("value")
-        dt = r.get("datetime_utc") or ""
-        stale = bool(r.get("stale"))
-        if not isinstance(loc_id, int) or not isinstance(val, (int, float)):
+        loc_id = row.get("locationsId")
+        observed = parse_observation_time(row.get("datetime_utc"))
+        if not isinstance(loc_id, int) or isinstance(loc_id, bool) or observed is None:
             continue
-        prev = loc_value.get(loc_id)
-        if prev is None or dt > prev[1]:
-            loc_value[loc_id] = (float(val), dt, stale)
+        candidates.setdefault(loc_id, []).append((observed, row))
 
-    points: list[tuple[float, float, float | None, bool]] = []
+    points = []
     for loc in ny_locations:
-        loc_id = loc.get("id")
-        c = loc.get("coordinates") or {}
+        coords = loc.get("coordinates") or {}
         try:
-            lon = float(c.get("longitude"))
-            lat = float(c.get("latitude"))
+            lon, lat = float(coords.get("longitude")), float(coords.get("latitude"))
         except (TypeError, ValueError):
             continue
-        v = loc_value.get(loc_id) if isinstance(loc_id, int) else None
-        if v:
-            points.append((lon, lat, v[0], v[2]))
-        else:
-            points.append((lon, lat, None, True))
+        if not math.isfinite(lon) or not math.isfinite(lat):
+            continue
+        options = candidates.get(loc.get("id"), [])
+        value, observed, status = None, None, "unavailable"
+        if options:
+            observed = max(t for t, _ in options)
+            latest = [r for t, r in options if t == observed]
+            valid = []
+            for row in latest:
+                raw = row.get("value")
+                if (isinstance(raw, (int, float)) and not isinstance(raw, bool)
+                        and math.isfinite(raw) and raw >= 0
+                        and units and units.strip().lower() not in ("", "unknown")
+                        and row.get("units") == units
+                        and (collection_ended_at is None or observed <= collection_ended_at)):
+                    valid.append(row)
+            # Conflicting simultaneous readings or incompatible units must not
+            # be combined into a single concentration point.
+            if len(valid) == len(latest) and len({r["value"] for r in valid}) == 1:
+                value = float(valid[0]["value"])
+                stale = (observed < collection_ended_at - timedelta(hours=stale_hours)
+                         if collection_ended_at is not None
+                         else any(r.get("stale", True) for r in valid))
+                status = "stale" if stale else "fresh"
+        points.append((lon, lat, value, observed, status, loc))
 
-    def percentile(values: list[float], p: float) -> float:
-        if not values:
-            return 0.0
-        xs = sorted(values)
-        k = (len(xs) - 1) * p
-        f = int(k)
-        c = min(f + 1, len(xs) - 1)
-        if c == f:
-            return xs[f]
-        return xs[f] + (xs[c] - xs[f]) * (k - f)
+    values = sorted(value for _, _, value, _, status, _ in points if status == "fresh")
 
-    def clamp01(x: float) -> float:
-        return max(0.0, min(1.0, x))
+    def percentile(p: float) -> float:
+        k = (len(values) - 1) * p
+        low = int(k)
+        high = min(low + 1, len(values) - 1)
+        return values[low] + (values[high] - values[low]) * (k - low)
 
-    def lerp(a: float, b: float, t: float) -> float:
-        return a + (b - a) * t
+    vmin, vmax = (percentile(0.05), percentile(0.95)) if values else (None, None)
 
-    def color_ramp(t: float) -> str:
-        t = clamp01(t)
-        if t < 0.5:
-            tt = t / 0.5
-            r = int(lerp(52, 243, tt))
-            g = int(lerp(152, 156, tt))
-            b = int(lerp(219, 18, tt))
-        else:
-            tt = (t - 0.5) / 0.5
-            r = int(lerp(243, 231, tt))
-            g = int(lerp(156, 76, tt))
-            b = int(lerp(18, 60, tt))
-        return f"rgb({r},{g},{b})"
-    
-    def color_for_t(t: float) -> str:
-        return color_ramp(clamp01(t))
+    def color(t: float) -> str:
+        # A sequential blue ramp avoids implying EPA health categories.
+        t = max(0.0, min(1.0, t))
+        return "rgb({},{},{})".format(*(round(a + (b - a) * t)
+                                     for a, b in zip((190, 219, 240), (8, 70, 125))))
 
-    def _units_look_like_ugm3(u: str) -> bool:
-        uu = (u or "").strip().lower()
-        return ("µg" in uu) or ("ug/m" in uu) or ("ugm3" in uu) or ("ug" in uu and "m3" in uu)
-
-    def pm25_to_aqi(pm: float) -> int:
-        """
-        US EPA PM2.5 AQI breakpoints (µg/m³), piecewise linear.
-        """
-        # (Clow, Chigh, Ilow, Ihigh)
-        bps = [
-            (0.0, 12.0, 0, 50),
-            (12.1, 35.4, 51, 100),
-            (35.5, 55.4, 101, 150),
-            (55.5, 150.4, 151, 200),
-            (150.5, 250.4, 201, 300),
-            (250.5, 350.4, 301, 400),
-            (350.5, 500.4, 401, 500),
-        ]
-        x = max(0.0, float(pm))
-        for cl, ch, il, ih in bps:
-            if x <= ch:
-                return int(round(((ih - il) / (ch - cl)) * (x - cl) + il))
-        return 500
-
-    def pm25_category(aqi: int) -> tuple[str, str]:
-        """
-        Returns: (category_label, hex_color)
-        """
-        if aqi <= 50:
-            return ("Good (0–50)", "#00E400")
-        if aqi <= 100:
-            return ("Moderate (51–100)", "#FFFF00")
-        if aqi <= 150:
-            return ("Unhealthy for Sensitive Groups (101–150)", "#FF7E00")
-        if aqi <= 200:
-            return ("Unhealthy (151–200)", "#FF0000")
-        if aqi <= 300:
-            return ("Very Unhealthy (201–300)", "#8F3F97")
-        return ("Hazardous (301–500)", "#7E0023")
-
-    use_aqi = primary_param.strip().lower() == "pm25" and _units_look_like_ugm3(units)
-
-    # For non-AQI params, keep the old relative scaling (p5–p95)
-    vals_fresh = [v for _, _, v, stale in points if isinstance(v, (int, float)) and (not stale)]
-    vals_all = [v for _, _, v, _ in points if isinstance(v, (int, float))]
-    scale_vals = vals_fresh if vals_fresh else vals_all
-    vmin = percentile(scale_vals, 0.05)
-    vmax = percentile(scale_vals, 0.95)
-    if vmax <= vmin:
-        vmax = vmin + 1.0
-
-    def value_to_t(v: float) -> float:
-        return clamp01((v - vmin) / (vmax - vmin))
-
-    def color_for(v: float | None, stale: bool) -> str:
-        if v is None:
-            return "lightgray"
-        if stale:
-            return "rgb(180,180,180)"
-        if use_aqi:
-            aqi = pm25_to_aqi(float(v))
-            _, col = pm25_category(aqi)
-            return col
-        return color_ramp(value_to_t(float(v)))
-
-    def radius_for(v: float | None, stale: bool) -> float:
-        if v is None or stale:
-            return 3.5
-        if use_aqi:
-            aqi = pm25_to_aqi(float(v))
-            # Slight emphasis by AQI category (keeps dots readable)
-            if aqi <= 50:
-                return 4.0
-            if aqi <= 100:
-                return 5.0
-            if aqi <= 150:
-                return 6.0
-            if aqi <= 200:
-                return 7.0
-            if aqi <= 300:
-                return 8.0
-            return 9.0
-        t = value_to_t(float(v))
-        return 3.0 + t * 6.0  # 3 -> 9
-
-    # Bounds from NY polygon
-    lons: list[float] = []
-    lats: list[float] = []
-    for poly in ny_multipolygon:
-        for lon, lat in poly[0]:
-            lons.append(float(lon))
-            lats.append(float(lat))
-    min_lon, max_lon = min(lons), max(lons)
-    min_lat, max_lat = min(lats), max(lats)
-    lat_ref = sum(lats) / len(lats) if lats else 0.0
-    lon_scale = math.cos(math.radians(lat_ref))
-
-    width, height = 960, 560
-    pad = 20
-    header_h = 64
-    footer_h = 92
-    map_top = 94
-    map_bottom = 104
+    lons = [float(lon) for poly in ny_multipolygon for lon, _ in poly[0]]
+    lats = [float(lat) for poly in ny_multipolygon for _, lat in poly[0]]
+    min_lon, max_lon, min_lat, max_lat = min(lons), max(lons), min(lats), max(lats)
+    lon_scale = math.cos(math.radians(sum(lats) / len(lats)))
+    width, height = 960, 600
+    map_top, map_bottom, pad = 126, 154, 28
     lon_span = (max_lon - min_lon) * lon_scale or 1.0
     lat_span = max_lat - min_lat or 1.0
-    drawable_w = width - 2 * pad
-    drawable_h = height - map_top - map_bottom
+    drawable_w, drawable_h = width - 2 * pad, height - map_top - map_bottom
     scale = min(drawable_w / lon_span, drawable_h / lat_span)
     x0 = pad + (drawable_w - lon_span * scale) / 2
     y0 = map_top + (drawable_h - lat_span * scale) / 2
 
     def project(lon: float, lat: float) -> tuple[float, float]:
-        x = x0 + ((lon - min_lon) * lon_scale) * scale
-        y = y0 + (max_lat - lat) * scale
-        return x, y
+        return x0 + (lon - min_lon) * lon_scale * scale, y0 + (max_lat - lat) * scale
 
-    parts: list[str] = []
-    parts.append(f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}">')
-    parts.append(f'<rect x="0" y="0" width="{width}" height="{height}" fill="#F7F5EF"/>')
-    parts.append(
-        f'<rect x="14" y="14" width="{width - 28}" height="{height - 28}" rx="18" ry="18" '
-        f'fill="#FFFFFF" stroke="#E4E8EE" stroke-width="1"/>'
-    )
-    display_param = pretty_parameter_name(primary_param)
+    parts = [f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" role="img" aria-labelledby="map-title map-description">',
+             '<title id="map-title">New York State latest concentration snapshot</title>',
+             '<desc id="map-description">Colors show relative concentrations within this snapshot, not AQI. Observation times vary. Stale readings are gray; unavailable readings are light gray.</desc>',
+             f'<rect width="{width}" height="{height}" fill="#F7F5EF"/>',
+             f'<rect x="14" y="14" width="{width - 28}" height="{height - 28}" rx="18" fill="#FFFFFF" stroke="#E4E8EE"/>']
 
-    fresh_n = sum(1 for _, _, v, stale in points if (v is not None) and (not stale))
-    stale_n = sum(1 for _, _, v, stale in points if (v is not None) and stale)
-    missing_n = sum(1 for _, _, v, _ in points if v is None)
+    def text(x: float, y: float, content: str, size: float = 12, **attrs) -> None:
+        extra = " ".join(f'{key.replace("_", "-")}="{val}"' for key, val in attrs.items())
+        parts.append(f'<text x="{x}" y="{y}" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="{size}" fill="#344454" {extra}>{escape(content)}</text>')
 
-    parts.append(
-        f'<rect x="28" y="14" width="{width - 56}" height="{header_h}" rx="16" ry="16" '
-        f'fill="#FBFCFD" stroke="#E1E6EB" stroke-width="1"/>'
-    )
-    parts.append(
-        f'<text x="46" y="40" font-family="Public Sans, Inter, Aptos, Segoe UI, Arial, sans-serif" font-size="23" font-weight="600" fill="#1F2933">'
-        f'New York State — {escape(display_param)} (latest)'
-        f"</text>"
-    )
-    parts.append(
-        f'<text x="46" y="62" font-family="Public Sans, Inter, Aptos, Segoe UI, Arial, sans-serif" font-size="12.5" font-weight="400" fill="#607080">'
-        f'{escape(report_date)} • {escape(sample_label)} • fresh: {fresh_n} • stale: {stale_n} • missing: {missing_n}'
-        f"</text>"
-    )
+    fresh_n = sum(p[4] == "fresh" for p in points)
+    stale_n = sum(p[4] == "stale" for p in points)
+    unavailable_n = len(points) - fresh_n - stale_n
+    text(32, 43, f"New York State — {pretty_parameter_name(primary_param)} concentration (latest)", 22, font_weight="600")
+    text(32, 65, f"Report label: {report_date} • {sample_label}")
+    timing = "Collection time unavailable"
+    if collection_started_at is not None and collection_ended_at is not None:
+        timing = f"Collected (UTC): {utc_text(collection_started_at)} to {utc_text(collection_ended_at)}"
+    text(32, 85, timing, 11)
+    text(32, 105, f"Fresh: {fresh_n} • stale: {stale_n} • unavailable: {unavailable_n} • observation times vary", 11)
+
     for poly in ny_multipolygon:
-        outer = poly[0]
-        d = []
-        for i, (lon, lat) in enumerate(outer):
+        path = []
+        for i, (lon, lat) in enumerate(poly[0]):
             x, y = project(float(lon), float(lat))
-            d.append(("M" if i == 0 else "L") + f"{x:.2f},{y:.2f}")
-        d.append("Z")
-        parts.append(
-            f'<path d="{" ".join(d)}" fill="#EEF2EA" stroke="#1F2933" stroke-width="1.25" stroke-linejoin="round"/>'
-        )
+            path.append(("M" if i == 0 else "L") + f"{x:.2f},{y:.2f}")
+        parts.append(f'<path d="{" ".join(path)} Z" fill="#EEF2EA" stroke="#1F2933" stroke-width="1.25" stroke-linejoin="round"/>')
 
-    for lon, lat, v, stale in points:
+    for lon, lat, value, observed, status, loc in points:
         x, y = project(lon, lat)
-        fill = color_for(v, stale)
-        r = radius_for(v, stale)
-        parts.append(
-            f'<circle cx="{x:.2f}" cy="{y:.2f}" r="{r:.2f}" fill="{fill}" stroke="#24313A" stroke-width="0.75"/>'
-        )
+        fill = "lightgray" if status == "unavailable" else "rgb(180,180,180)"
+        if status == "fresh":
+            t = (value - vmin) / (vmax - vmin) if vmax > vmin else 0.5
+            fill = color(t)
+        detail = f"{loc.get('name') or 'Location'} (ID {loc.get('id')}): {status}"
+        if value is not None:
+            detail += f"; {value:g} {units}"
+        if observed is not None:
+            detail += f"; observed {utc_text(observed)}"
+        parts.append(f'<circle cx="{x:.2f}" cy="{y:.2f}" r="4.5" fill="{fill}" stroke="#24313A" stroke-width="0.75"><title>{escape(detail)}</title></circle>')
 
-    # Legend box (bottom-left, above the footer line)
-    legend_w = 352 if use_aqi else 280
-    legend_h = 124 if use_aqi else 60
-    legend_x = pad
-    legend_y = height - footer_h - legend_h + 18
-
-    parts.append(
-        f'<rect x="{legend_x}" y="{legend_y}" width="{legend_w}" height="{legend_h}" rx="14" ry="14" '
-        f'fill="#FBFCFD" stroke="#D8E0E7" stroke-width="1"/>'
-    )
-
-    if use_aqi:
-        parts.append(
-            f'<text x="{legend_x + 12}" y="{legend_y + 20}" font-family="Inter, Aptos, Segoe UI, Arial, sans-serif" font-size="12.5" fill="#1F2933">'
-            f'PM2.5 AQI categories'
-            f"</text>"
-        )
-
-        # (label, color, pm25_range)
-        cats = [
-            ("Good (0–50)", "#00E400", "0.0–12.0"),
-            ("Moderate (51–100)", "#FFFF00", "12.1–35.4"),
-            ("USG (101–150)", "#FF7E00", "35.5–55.4"),
-            ("Unhealthy (151–200)", "#FF0000", "55.5–150.4"),
-            ("Very Unhealthy (201–300)", "#8F3F97", "150.5–250.4"),
-            ("Hazardous (301–500)", "#7E0023", "250.5+"),
-        ]
-
-        y = legend_y + 34
-        for label, col, rng in cats:
-            parts.append(
-                f'<rect x="{legend_x + 12}" y="{y - 10}" width="12" height="12" rx="2" ry="2" fill="{col}" '
-                f'stroke="#24313A" stroke-width="0.45"/>'
-            )
-            parts.append(
-                f'<text x="{legend_x + 30}" y="{y}" font-family="Inter, Aptos, Segoe UI, Arial, sans-serif" font-size="11" fill="#1F2933">'
-                f'{escape(label)}  (µg/m³: {escape(rng)})'
-                f"</text>"
-            )
-            y += 14
-
-        parts.append(
-            f'<text x="28" y="{height - 22}" font-family="Inter, Aptos, Segoe UI, Arial, sans-serif" font-size="12" fill="#607080">'
-            f"Stale points shown in gray"
-            f"</text>"
-        )
+    text(32, 471, f"Concentration ({units or 'units unavailable'}) — relative scale", 13, font_weight="600")
+    if values:
+        for i in range(32):
+            t = i / 31
+            fill = color(t if vmax > vmin else 0.5)
+            parts.append(f'<rect x="{32 + i * 9}" y="483" width="9" height="12" fill="{fill}"/>')
+        text(32, 514, f"{vmin:.2f}")
+        text(320, 514, f"{vmax:.2f}", text_anchor="end")
+        text(344, 495, "Fresh readings: 5th–95th percentiles; values outside this range use end colors.", 11)
     else:
-        parts.append(
-            f'<text x="{legend_x + 12}" y="{legend_y + 20}" font-family="Inter, Aptos, Segoe UI, Arial, sans-serif" font-size="12.5" fill="#1F2933">'
-            f'{escape(pretty_parameter_name(primary_param))} scale ({escape(units)})'
-            f"</text>"
-        )
-
-        # Color ramp (left->right)
-        ramp_x0 = legend_x + 12
-        ramp_y0 = legend_y + 30
-        ramp_w = legend_w - 24
-        ramp_h = 10
-        steps = 24
-        step_w = ramp_w / steps
-
-        for i in range(steps):
-            t0 = i / steps
-            x = ramp_x0 + i * step_w
-            parts.append(
-                f'<rect x="{x:.2f}" y="{ramp_y0:.2f}" width="{step_w + 0.6:.2f}" height="{ramp_h}" '
-                f'fill="{color_for_t(t0)}" stroke="none"/>'
-            )
-
-        parts.append(
-            f'<text x="{ramp_x0:.2f}" y="{legend_y + 54}" font-family="Inter, Aptos, Segoe UI, Arial, sans-serif" font-size="11" fill="#607080">'
-            f"{vmin:.2f}</text>"
-        )
-        parts.append(
-            f'<text x="{(ramp_x0 + ramp_w):.2f}" y="{legend_y + 54}" font-family="Inter, Aptos, Segoe UI, Arial, sans-serif" font-size="11" fill="#607080" '
-            f'text-anchor="end">{vmax:.2f}</text>'
-        )
-
-        parts.append(
-            f'<text x="28" y="{height - 22}" font-family="Inter, Aptos, Segoe UI, Arial, sans-serif" font-size="12" fill="#607080">'
-            f"Scale uses p5–p95; stale points shown in gray"
-            f"</text>"
-        )
-
+        text(32, 495, "No fresh valid readings available; no concentration scale is shown.")
+    text(32, 542, "Colors are relative to this snapshot; compare numeric values across dates.", 11)
+    text(32, 563, "Not an AQI or a daily average. Gray: stale; light gray: unavailable or invalid.", 11)
     parts.append("</svg>")
-
+    map_path = report_dir / "map.svg"
     map_path.write_text("\n".join(parts) + "\n", encoding="utf-8")
     return map_path
 
@@ -1086,6 +921,8 @@ def write_outputs(
     rows: list[dict],
     top_params: list[tuple[str, int]],
     latest_errors: list[tuple[int, str]] | None = None,
+    collection_started_at: datetime | None = None,
+    collection_ended_at: datetime | None = None,
 ) -> dict[str, Path]:
     """
     Write daily artifacts (idempotent per report date).
@@ -1146,7 +983,12 @@ def write_outputs(
     lines.append(f"# NYS air quality daily summary — {report_date}")
     lines.append("")
     lines.append("## Technical summary")
-    lines.append(f"- Report date (America/New_York): {report_date}")
+    lines.append(f"- Report date label (America/New_York): {report_date}")
+    if collection_started_at is not None and collection_ended_at is not None:
+        from nys_aq.snapshot import utc_text
+
+        lines.append(f"- Collection started (UTC): {utc_text(collection_started_at)}")
+        lines.append(f"- Collection ended (UTC): {utc_text(collection_ended_at)}")
     lines.append(f"- Locations in NY boundary: {len(ny_locations)}")
     lines.append(f"- Locations used: {sample_label}")
     lines.append(f"- Measurements normalized: {len(rows)}")
@@ -1178,6 +1020,11 @@ def write_outputs(
     lines.append(
         "This report checks a stable set of monitoring locations within New York State and records the latest readings "
         "available from OpenAQ. Some readings may be old; the quality section above tracks how many are considered stale."
+    )
+    lines.append(
+        "The report date is an output label, not a full day of observations. "
+        "Observation times vary by sensor. The map shows concentrations, not AQI or daily averages; "
+        "its colors are relative to this snapshot and cannot be compared directly across dates."
     )
     if primary_param == "pm25":
         lines.append("")
@@ -1215,6 +1062,9 @@ def write_outputs(
         rows=rows,
         primary_param=map_param,
         units=unit,
+        collection_started_at=collection_started_at,
+        collection_ended_at=collection_ended_at,
+        stale_hours=cfg.stale_hours,
     )
 
     return {
@@ -1225,8 +1075,10 @@ def write_outputs(
     }
 
 
-def run_daily(*, run_date: date | None = None, tz_name: str = "America/New_York") -> DailyConfig:
-    cfg = load_config(run_date=run_date, tz_name=tz_name)
+def run_daily(
+    *, run_date: date | None = None, tz_name: str = "America/New_York", repo_root: Path | None = None,
+) -> DailyConfig:
+    cfg = load_config(run_date=run_date, tz_name=tz_name, repo_root=repo_root)
 
     locations_latency_ms, locations = fetch_locations(cfg)
     ny_poly = load_ny_multipolygon(cfg)
@@ -1235,7 +1087,12 @@ def run_daily(*, run_date: date | None = None, tz_name: str = "America/New_York"
     sampled = stable_sample_locations(ny_locations, cfg.sample_size, salt=cfg.bbox)
     location_ids = [loc["id"] for loc in sampled if isinstance(loc.get("id"), int)]
 
-    latest_ok, latest_errors, latest_elapsed_s = fetch_latest_for_locations(cfg, location_ids)
+    request_records: list[dict] = []
+    collection_started = datetime.now(timezone.utc)
+    latest_ok, latest_errors, latest_elapsed_s = fetch_latest_for_locations(
+        cfg, location_ids, request_records=request_records,
+    )
+    collection_ended = datetime.now(timezone.utc)
     if latest_errors:
         print("latest_fetch_errors:", len(latest_errors))
         for loc_id, msg in latest_errors[:5]:
@@ -1305,11 +1162,27 @@ def run_daily(*, run_date: date | None = None, tz_name: str = "America/New_York"
         rows=rows,
         top_params=top_params,
         latest_errors=latest_errors,
+        collection_started_at=collection_started,
+        collection_ended_at=collection_ended,
     )
     print("wrote_daily_csv:", outputs["daily_csv"])
     print("wrote_note:", outputs["note"])
     print("wrote_chart:", outputs["chart"])
     print("wrote_map:", outputs["map"])
+
+    from nys_aq.snapshot import build_snapshot, write_snapshot
+
+    snapshot = build_snapshot(
+        report_date=cfg.run_date.isoformat(), started_at=collection_started,
+        ended_at=collection_ended, stale_hours=cfg.stale_hours,
+        ny_locations=ny_locations, sampled_locations=sampled,
+        requests=request_records, rows=rows,
+    )
+    snapshot_path = cfg.repo_root / "reports" / cfg.run_date.isoformat() / "snapshot.json"
+    # A storage failure fails the run, preventing CI from publishing an old
+    # snapshot as new evidence. Existing report generation has already completed.
+    write_snapshot(snapshot_path, snapshot)
+    print("wrote_snapshot:", snapshot_path)
 
     pruned = prune_old_artifacts(cfg)
     if pruned["deleted_notes"] or pruned["deleted_report_dirs"]:

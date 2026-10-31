@@ -21,6 +21,9 @@ Daily runs are automated via GitHub Actions and proposed as pull requests for hu
 
 For each report date (yesterday in `America/New_York`):
 
+The report date is an output label. Each run fetches the latest available readings
+at collection time; it does not retrieve a full calendar day of observations.
+
 - `notes/YYYY-MM-DD.md`  
   A daily write-up with:
   - technical summary (counts, timings, quality checks)
@@ -30,11 +33,25 @@ For each report date (yesterday in `America/New_York`):
 - `reports/YYYY-MM-DD/map.svg`  
   NYS map of location points colored by the selected pollutant parameter (latest value). Includes a p5–p95 legend and freshness summary (fresh vs stale vs missing).
 
+  New maps display concentrations using a blue scale based on fresh, valid
+  readings. They show the UTC collection interval and distinguish fresh, stale,
+  and unavailable/invalid readings. Point tooltips give values and observation
+  times. Colors are relative to each snapshot, not health categories; compare
+  numeric concentrations across dates. These maps do not calculate daily or
+  NowCast AQI. Existing historical SVGs are preserved as originally generated.
+
 - `reports/YYYY-MM-DD/parameter_coverage.svg`  
   Pollutant coverage chart showing which pollutant parameters were returned by `/latest` across the NY locations. Percentages represent the share of measurements in that snapshot (not severity).
 
 - `data/daily.csv`  
   A CSV summary with one row per report date (idempotent upsert by date).
+
+- `reports/YYYY-MM-DD/snapshot.json`
+  A versioned, machine-readable snapshot of all fetched parameters, with sensor
+  and location identities, units, original values, observation timestamps,
+  collection timing, request outcomes, and data-quality flags. New snapshots are
+  produced going forward; old report folders do not gain historical measurements.
+  This is preparation for an air-quality investigator, not an implemented agent.
 
 The automation opens a daily pull request so changes are reviewed and merged by a human.
 
@@ -79,6 +96,10 @@ To keep the repository readable over time, the daily job automatically removes o
 
 The CSV summary (`data/daily.csv`) is retained indefinitely so longer-term trends can still be analyzed.
 
+Measurement snapshots are deleted with their dated report folders. With the
+current inclusive cutoff, `RETENTION_DAYS=91` can retain 92 date labels. Deletion
+limits current files; previous versions remain in Git history.
+
 Retention is controlled by `RETENTION_DAYS` (default: 91). This keeps roughly a quarter’s worth of daily snapshots visible for review while preventing the repo from accumulating unlimited artifacts.
 
 ## Local setup
@@ -120,6 +141,50 @@ Run for a specifc date:
 ```bash
 python scripts/run_daily.py --date YYYY-MM-DD
 ```
+
+`--date` changes the output label and retention reference, not the observations
+requested from OpenAQ. Rerunning a label replaces its snapshot with a new
+collection. A snapshot-write failure fails the run; any previous snapshot remains
+as older evidence, with its original collection timestamps. This prevents CI from
+publishing a failed collection as a successful update. Outputs are not written as
+one transaction across CSV, notes, maps, and snapshots.
+
+For development, `run_daily(repo_root=...)` supports an isolated root containing
+`data/nys_boundary.geojson`; live collection still requires the API key. Prefer
+mocked requests and temporary directories for tests.
+
+## Development
+
+Inspect one saved measurement snapshot, or compare two specified collections:
+
+```bash
+python scripts/compare_snapshots.py reports/YYYY-MM-DD/snapshot.json
+python scripts/compare_snapshots.py /path/to/baseline/snapshot.json /path/to/current/snapshot.json
+```
+
+The tool reads files and prints JSON; it makes no network requests and changes no
+reports. It defaults to PM2.5 in exact `µg/m³` units, with no automatic conversion.
+Use `--help` for the configurable observation-gap and matched-location limits.
+Historical report directories created before snapshot storage have no input JSON;
+comparisons need newly collected snapshots or clearly labeled synthetic fixtures.
+
+Results include per-sensor values, deltas, percentages, observation times,
+matched coverage, and source JSON pointers. Stale/invalid readings, repeats,
+conflicts, changed locations, incompatible units, and excessive observation gaps
+are excluded explicitly. Missing evidence produces `insufficient_data`, not a
+zero concentration. Percent change is null for a zero baseline or numeric overflow.
+Summary medians describe matched sensors, not statewide averages. No health,
+wildfire-causation, or event-severity judgment is assigned.
+
+Run the offline test suite in the installed environment:
+
+```bash
+python -m unittest discover -s tests -v
+```
+
+The separate `Offline tests` workflow checks Python 3.11 for code/test changes.
+It does not require API secrets or perform live collection. See `AGENTS.md` for
+repository guidance and `SPEC.md` for investigator requirements and progress.
 
 ## Repository layout
 
